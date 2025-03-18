@@ -3,7 +3,7 @@ using Shouldly;
 
 namespace LightRail.DotNet.Tests
 {
-    public class IntegerTests
+    public class IntegerExtensionsTests
     {
         [Fact]
         public void IsBetween_ShouldReturnTrue_WhenValueIsBetweenMinAndMax()

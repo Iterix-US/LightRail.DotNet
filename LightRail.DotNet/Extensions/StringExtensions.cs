@@ -1,4 +1,7 @@
 ﻿using System;
+using System.IO;
+using System.Text.Json;
+using System.Xml.Serialization;
 
 namespace LightRail.DotNet.Extensions
 {
@@ -134,6 +137,34 @@ namespace LightRail.DotNet.Extensions
                     return true;
                 default:
                     return bool.TryParse(baseString, out convertedValue);
+            }
+        }
+
+        public static T FromJsonToType<T>(this string jsonString)
+        {
+            try
+            {
+                return JsonSerializer.Deserialize<T>(jsonString);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while deserializing the JSON string.", ex);
+            }
+        }
+
+        public static T FromXmlToType<T>(this string xmlString)
+        {
+            try
+            {
+                var serializer = new XmlSerializer(typeof(T));
+                using (var reader = new StringReader(xmlString))
+                {
+                    return (T)serializer.Deserialize(reader);
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new InvalidOperationException($"Error deserializing XML to {typeof(T)}.", ex);
             }
         }
     }

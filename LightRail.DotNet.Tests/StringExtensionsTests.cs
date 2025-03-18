@@ -1,9 +1,10 @@
 ﻿using LightRail.DotNet.Extensions;
+using LightRail.DotNet.Tests.TestObjects;
 using Shouldly;
 
 namespace LightRail.DotNet.Tests
 {
-    public class StringTests
+    public class StringExtensionsTests
     {
         [Fact]
         public void ContainsIgnoreCase_ShouldReturnTrue_WhenStringContainsValueIgnoringCase()
@@ -198,6 +199,60 @@ namespace LightRail.DotNet.Tests
             // Assert
             success.ShouldBeTrue();
             result.ShouldBeFalse();
+        }
+
+        [Fact]
+        public void FromJsonToType_ShouldDeserializeJsonStringToObject()
+        {
+            // Arrange
+            var jsonString = "{\"Id\":1,\"Name\":\"Test\"}";
+            var expectedObject = new SerializationObject { Id = 1, Name = "Test" };
+
+            // Act
+            var result = jsonString.FromJsonToType<SerializationObject>();
+
+            // Assert
+            result.ShouldNotBeNull();
+            result.Id.ShouldBe(expectedObject.Id);
+            result.Name.ShouldBe(expectedObject.Name);
+        }
+
+        [Fact]
+        public void FromJsonToType_ShouldThrowExceptionForInvalidJson()
+        {
+            // Arrange
+            var invalidJsonString = "{\"Id\":1,\"Name\":\"Test\"";
+
+            // Act & Assert
+            var exception = Should.Throw<Exception>(() => invalidJsonString.FromJsonToType<SerializationObject>());
+            exception.Message.ShouldContain("An error occurred while deserializing the JSON string.");
+        }
+
+        [Fact]
+        public void FromXmlToType_ShouldDeserializeXmlStringToObject()
+        {
+            // Arrange
+            var xmlString = "<SerializationObject><Id>1</Id><Name>Test</Name></SerializationObject>";
+            var expectedObject = new SerializationObject { Id = 1, Name = "Test" };
+
+            // Act
+            var result = xmlString.FromXmlToType<SerializationObject>();
+
+            // Assert
+            result.ShouldNotBeNull();
+            result.Id.ShouldBe(expectedObject.Id);
+            result.Name.ShouldBe(expectedObject.Name);
+        }
+
+        [Fact]
+        public void FromXmlToType_ShouldThrowExceptionForInvalidXml()
+        {
+            // Arrange
+            var invalidXmlString = "<SerializationObject><Id>1<Id><Name>Test</Name></SerializationObject>";
+
+            // Act & Assert
+            var exception = Should.Throw<InvalidOperationException>(() => invalidXmlString.FromXmlToType<SerializationObject>());
+            exception.Message.ShouldContain($"Error deserializing XML to {typeof(SerializationObject)}.");
         }
     }
 }
