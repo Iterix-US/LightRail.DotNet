@@ -140,6 +140,13 @@ namespace LightRail.DotNet.Extensions
             }
         }
 
+        /// <summary>
+        /// Converts a string to a byte array
+        /// </summary>
+        /// <typeparam name="T">The object to deserialize the JSON into</typeparam>
+        /// <param name="jsonString">The JSON string being deserialized into an object</param>
+        /// <returns>The deserialized and hydrated object</returns>
+        /// <exception cref="Exception">Converting from string to given type experienced an error.</exception>
         public static T FromJsonToType<T>(this string jsonString)
         {
             try
@@ -152,6 +159,13 @@ namespace LightRail.DotNet.Extensions
             }
         }
 
+        /// <summary>
+        /// Converts an XML string to an object of the specified type.
+        /// </summary>
+        /// <typeparam name="T">The XML string being deserialized into an object</typeparam>
+        /// <param name="xmlString">The XML string being deserialized into an object</param>
+        /// <returns>The deserialized and hydrated object</returns>
+        /// <exception cref="InvalidOperationException">Converting from string to given type experienced an error.</exception>
         public static T FromXmlToType<T>(this string xmlString)
         {
             try

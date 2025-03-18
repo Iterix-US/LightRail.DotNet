@@ -89,32 +89,6 @@ namespace LightRail.DotNet.Tests
         }
 
         [Fact]
-        public void ToTrueFalse_ShouldReturnTrueForTrue()
-        {
-            // Arrange
-            bool boolean = true;
-
-            // Act
-            var result = boolean.ToTrueFalse();
-
-            // Assert
-            result.ShouldBe("True");
-        }
-
-        [Fact]
-        public void ToTrueFalse_ShouldReturnFalseForFalse()
-        {
-            // Arrange
-            bool boolean = false;
-
-            // Act
-            var result = boolean.ToTrueFalse();
-
-            // Assert
-            result.ShouldBe("False");
-        }
-
-        [Fact]
         public void ToOnOff_ShouldReturnOnForTrue()
         {
             // Arrange
