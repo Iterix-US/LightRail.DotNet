@@ -3,7 +3,7 @@ using Shouldly;
 
 namespace LightRail.DotNet.Tests
 {
-    public class DecimalTests
+    public class DecimalExtensionsTests
     {
         [Fact]
         public void IsPositive_ShouldReturnTrue_WhenValueIsPositive()
