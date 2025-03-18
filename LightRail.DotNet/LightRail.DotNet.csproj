@@ -2,7 +2,30 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>LightRail.DotNet</Title>
+    <Company>Iterix</Company>
+    <Description>A powerful yet lightweight toolkit that simplifies, accelerates, and enhances your .NET development.</Description>
+    <Copyright>Iterix 2025</Copyright>
+    <PackageProjectUrl>https://github.com/Iterix-US/LightRail.DotNet</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/Iterix-US/LightRail.DotNet</RepositoryUrl>
+    <PackageTags>extensions;toolkit;expansion;dotnet;netstandard;</PackageTags>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="System.Text.Json" Version="9.0.3" />
