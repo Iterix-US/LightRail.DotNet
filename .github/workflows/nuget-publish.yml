@@ -53,8 +53,12 @@ jobs:
       - name: Build Solution
         run: dotnet build --configuration Release --no-restore
 
-      - name: Create NuGet Package
-        run: dotnet pack --configuration Release --no-build --output nupkg
-
+      - name: Get Version from Git Tag
+        id: get_version
+        run: echo "VERSION=$(git describe --tags --always --match 'v[0-9]*' | sed 's/^v//')" >> $GITHUB_ENV
+      
+      - name: Create NuGet Package with Git Version
+        run: dotnet pack --configuration Release --no-build --output nupkg /p:Version=${{ env.VERSION }}
+      
       - name: Publish to NuGet
-        run: dotnet nuget push "nupkg/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+        run: dotnet nuget push "nupkg/*.nupkg" --api-key ${{ secrets.LIGHTRAILDOTNETNUGET }} --source https://api.nuget.org/v3/index.json --skip-duplicate
