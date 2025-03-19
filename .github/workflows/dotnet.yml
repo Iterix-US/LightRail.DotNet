@@ -18,10 +18,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup .NET SDK
+      - name: Setup .NET SDK (6.0 & 8.0)
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '6.0.x' # Ensure compatibility with .NET Standard 2.0
+          dotnet-version: |
+            6.0.x
+            8.0.x
 
       - name: Restore Dependencies
         run: dotnet restore
@@ -42,10 +44,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup .NET SDK
+      - name: Setup .NET SDK (6.0 & 8.0)
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '6.0.x' # Using .NET 6 to ensure compatibility with .NET Standard 2.0
+          dotnet-version: |
+            6.0.x
+            8.0.x
 
       - name: Restore Dependencies
         run: dotnet restore
