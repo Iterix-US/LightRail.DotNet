@@ -63,8 +63,10 @@ jobs:
       - name: Get Version from Git Tag
         id: get_version
         run: |
-          TAG_VERSION=$(git describe --tags --always --match 'v[0-9]*' | sed 's/^v//')
-          if [[ -z "$TAG_VERSION" ]]; then TAG_VERSION="1.0.0"; fi
+          TAG_VERSION=$(git describe --tags --match "v[0-9]*" --always | sed 's/^v//')
+          if [[ ! "$TAG_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+            TAG_VERSION="1.0.0-adf1acc"
+          fi
           echo "VERSION=$TAG_VERSION" >> $GITHUB_ENV
       
       - name: Create NuGet Package with Git Version
