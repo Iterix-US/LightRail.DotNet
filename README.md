@@ -28,18 +28,6 @@ At Iterix, we know that the repetitive tasks in software development slow teams 
 
 ---
 
-### 🧰 **Installation (NuGet - Coming Soon):**
-
-We’re preparing a NuGet package to simplify installation—stay tuned. Until then, you can build from source:
-
-```bash
-git clone https://github.com/Iterix-US/LightRail.DotNet.git
-cd LightRail.DotNet
-dotnet build
-```
-
----
-
 ### 🚀 **Quick Examples:**
 
 **Serialize an object to XML quickly:**
