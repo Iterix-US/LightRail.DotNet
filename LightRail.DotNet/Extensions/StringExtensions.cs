@@ -1,5 +1,10 @@
+﻿@ -0,0 + 1,257 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
+using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using System.Xml.Serialization;
 
@@ -180,6 +185,74 @@ namespace LightRail.DotNet.Extensions
             {
                 throw new InvalidOperationException($"Error deserializing XML to {typeof(T)}.", ex);
             }
+        }
+
+
+        /// <summary>
+        /// Determines if a string is a valid Enum value
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public static bool IsValidEnumValue<T>(this string value, out T result) where T : struct, Enum
+        {
+            return Enum.TryParse(value, out result);
+        }
+
+        /// <summary>
+        /// Converts a string to an enum value based on the description attribute of the Enum value
+        /// Requires the enum to have values defined on its fields with the Description attribute
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="description"></param>
+        /// <returns></returns>
+        public static T? GetEnumFromDescription<T>(this string description) where T : struct, Enum
+        {
+            var type = typeof(T);
+
+            foreach (var field in type.GetFields())
+            {
+                var attribute = field.GetCustomAttribute<DescriptionAttribute>();
+                if (attribute != null && attribute.Description.Equals(description, StringComparison.OrdinalIgnoreCase))
+                {
+                    return (T)field.GetValue(null);
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Encodes a string as a URL
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string EncodeAsHttp(this string value)
+        {
+            return Uri.EscapeDataString(value);
+        }
+
+        /// <summary>
+        /// Hashes a string using SHA256
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static string ToSha256(this string input)
+        {
+            using (var sha256 = SHA256.Create())
+            {
+                var bytes = Encoding.UTF8.GetBytes(input);
+                return Convert.ToBase64String(sha256.ComputeHash(bytes));
+            }
+        }
+
+        public static string ToHexString(this string input, Encoding encoding = null)
+        {
+            var intendedEncoding = encoding ?? Encoding.UTF8;
+            var bytes = intendedEncoding.GetBytes(input);
+
+            return BitConverter.ToString(bytes).Replace("-", "").ToLowerInvariant();
         }
     }
 }
