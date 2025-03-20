@@ -29,19 +29,19 @@ namespace LightRail.DotNet.SecurityUtilities
             return saltBytes;
         }
 
-        public static string SlowHash(string input, byte[] salt)
-        {
-            var hash = DeriveKey(input, salt);
+        //public static string SlowHash(string input, byte[] salt)
+        //{
+        //    var hash = DeriveKey(input, salt);
 
-            return string.Join(
-                SegmentDelimiter,
-                hash.ToHexString(),
-                salt.ToHexString(),
-                Iterations,
-                Algorithm
-            );
-            return string.Empty;
-        }
+        //    return string.Join(
+        //        SegmentDelimiter,
+        //        hash.ToHexString(),
+        //        salt.ToHexString(),
+        //        Iterations,
+        //        Algorithm
+        //    );
+        //    return string.Empty;
+        //}
 
         public static byte[] DeriveKey(string password, byte[] salt, int iterations = 100_000, int keyLength = 32)
         {
@@ -51,25 +51,25 @@ namespace LightRail.DotNet.SecurityUtilities
             }
         }
 
-        public static Task<bool> Verify(string input, string hashString)
-        {
-            return Task.Run(() =>
-            {
-                var segments = hashString.Split(SegmentDelimiter);
-                var hash = segments[0].ToHexString();
-                var salt = segments[1].ToHexString();
-                var iterations = int.Parse(segments[2]);
-                var algorithm = new HashAlgorithmName(segments[3]);
+        //public static Task<bool> Verify(string input, string hashString)
+        //{
+        //    return Task.Run(() =>
+        //    {
+        //        var segments = hashString.Split(SegmentDelimiter);
+        //        var hash = segments[0].ToHexString();
+        //        var salt = segments[1].ToHexString();
+        //        var iterations = int.Parse(segments[2]);
+        //        var algorithm = new HashAlgorithmName(segments[3]);
 
-                byte[] inputHash = Rfc2898DeriveBytes.Pbkdf2(
-                    input,
-                    salt,
-                    iterations,
-                    algorithm,
-                    hash.Length
-                );
-                return CryptographicOperations.FixedTimeEquals(inputHash, hash);
-            });
-        }
+        //        byte[] inputHash = Rfc2898DeriveBytes.Pbkdf2(
+        //            input,
+        //            salt,
+        //            iterations,
+        //            algorithm,
+        //            hash.Length
+        //        );
+        //        return CryptographicOperations.FixedTimeEquals(inputHash, hash);
+        //    });
+        //}
     }
 }
