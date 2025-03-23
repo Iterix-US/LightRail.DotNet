@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using LightRail.DotNet.Extensions;
 using Shouldly;
 using Xunit;
@@ -74,6 +75,7 @@ namespace LightRail.DotNet.Tests
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage]
         public void ToHexString_ShouldThrowArgumentNullException_WhenNullInput()
         {
             // Arrange

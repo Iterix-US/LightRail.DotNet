@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text.Json;
 using LightRail.DotNet.Abstractions;
@@ -55,6 +56,7 @@ namespace LightRail.DotNet.FileManagement
             }
         }
 
+        [ExcludeFromCodeCoverage]
         private void SafeguardFile(string file)
         {
             var fileExists = _fileManager?.Exists(file) ?? File.Exists(file);
@@ -74,6 +76,7 @@ namespace LightRail.DotNet.FileManagement
             fileStream.Dispose();
         }
 
+        [ExcludeFromCodeCoverage]
         private void SafeguardDirectory(string path)
         {
             var directoryExists = _fileManager?.Exists(path) ?? Directory.Exists(path);

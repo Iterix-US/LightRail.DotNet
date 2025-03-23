@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using LightRail.DotNet.Extensions;
 using Shouldly;
 
 namespace LightRail.DotNet.Tests
 {
+    [ExcludeFromCodeCoverage]
     public class DateTimeExtensionsTests
     {
         [Fact]
@@ -98,12 +100,14 @@ namespace LightRail.DotNet.Tests
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage]
         public void Minus_ShouldThrow_WhenResultIsBeforeMinValue()
         {
             // Arrange
             var baseDate = new DateTime(10, 1, 1);
 
             // Act & Assert
+            
             Should.Throw<ArgumentOutOfRangeException>(() =>
             {
                 var _ = baseDate.Minus(years: 20);
