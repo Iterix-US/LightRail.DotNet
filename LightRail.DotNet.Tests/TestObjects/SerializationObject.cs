@@ -8,6 +8,6 @@ namespace LightRail.DotNet.Tests.TestObjects
     public class SerializationObject
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public required string Name { get; set; }
     }
 }
