@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using LightRail.DotNet.Abstractions;
 using LightRail.DotNet.FileManagement;
@@ -134,6 +135,7 @@ namespace LightRail.DotNet.Tests
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage]
         public void SaveJsonConfiguration_ShouldReThrow_IfInnerExceptionOccurs()
         {
             var fileManager = Substitute.For<IDirectoryManagement>();
