@@ -62,5 +62,125 @@ namespace LightRail.DotNet.Tests
             // Assert
             result.ShouldBe(expectedDateTime);
         }
+
+        [Theory]
+        [InlineData(DayOfWeek.Saturday, true)]
+        [InlineData(DayOfWeek.Sunday, true)]
+        [InlineData(DayOfWeek.Monday, false)]
+        [InlineData(DayOfWeek.Friday, false)]
+        public void IsWeekend_ShouldReturnExpectedResult(DayOfWeek dayOfWeek, bool expected)
+        {
+            // Arrange
+            var date = new DateTime(2023, 9, 4).AddDays((int)dayOfWeek -
+                                                        (int)DayOfWeek.Monday); // normalize to test day
+
+            // Act
+            var result = date.IsWeekend();
+
+            // Assert
+            result.ShouldBe(expected);
+        }
+
+        [Theory]
+        [InlineData(DayOfWeek.Monday, true)]
+        [InlineData(DayOfWeek.Tuesday, true)]
+        [InlineData(DayOfWeek.Sunday, false)]
+        public void IsWeekday_ShouldReturnExpectedResult(DayOfWeek dayOfWeek, bool expected)
+        {
+            // Arrange
+            var date = new DateTime(2023, 9, 4).AddDays((int)dayOfWeek - (int)DayOfWeek.Monday);
+
+            // Act
+            var result = date.IsWeekday();
+
+            // Assert
+            result.ShouldBe(expected);
+        }
+
+        [Fact]
+        public void Minus_ShouldThrow_WhenResultIsBeforeMinValue()
+        {
+            // Arrange
+            var baseDate = new DateTime(10, 1, 1);
+
+            // Act & Assert
+            Should.Throw<ArgumentOutOfRangeException>(() =>
+            {
+                var _ = baseDate.Minus(years: 20);
+            });
+        }
+
+
+        [Fact]
+        public void ToReadableTimeAgo_ShouldReturnSecondsAgo_ForRecentTime()
+        {
+            // Arrange
+            var date = DateTime.UtcNow.AddSeconds(-45);
+
+            // Act
+            var result = date.ToReadableTimeAgo();
+
+            // Assert
+            result.ShouldBe("45 seconds ago");
+        }
+
+        [Fact]
+        public void ToReadableTimeAgo_ShouldReturnMinutesAgo_ForRecentTime()
+        {
+            // Arrange
+            var date = DateTime.UtcNow.AddMinutes(-15);
+
+            // Act
+            var result = date.ToReadableTimeAgo();
+
+            // Assert
+            result.ShouldBe("15 minutes ago");
+        }
+
+        [Fact]
+        public void ToReadableTimeAgo_ShouldReturnHoursAgo_ForRecentTime()
+        {
+            // Arrange
+            var date = DateTime.UtcNow.AddHours(-3);
+
+            // Act
+            var result = date.ToReadableTimeAgo();
+
+            // Assert
+            result.ShouldBe("3 hours ago");
+        }
+
+        [Fact]
+        public void ToReadableTimeAgo_ShouldReturnDaysAgo_ForOldTime()
+        {
+            // Arrange
+            var date = DateTime.UtcNow.AddDays(-5);
+
+            // Act
+            var result = date.ToReadableTimeAgo();
+
+            // Assert
+            result.ShouldBe("5 days ago");
+        }
+
+        [Theory]
+        [InlineData(1, TimeOfDay.EarlyMorning)]
+        [InlineData(6, TimeOfDay.Dawn)]
+        [InlineData(9, TimeOfDay.Morning)]
+        [InlineData(13, TimeOfDay.Afternoon)]
+        [InlineData(17, TimeOfDay.Dusk)]
+        [InlineData(19, TimeOfDay.Evening)]
+        [InlineData(22, TimeOfDay.Night)]
+        public void GetTimeOfDay_ShouldReturnExpectedEnum(int hour, TimeOfDay expected)
+        {
+            // Arrange
+            var date = new DateTime(2023, 1, 1, hour, 0, 0);
+
+            // Act
+            var result = date.GetTimeOfDay();
+
+            // Assert
+            result.ShouldBe(expected);
+        }
     }
 }

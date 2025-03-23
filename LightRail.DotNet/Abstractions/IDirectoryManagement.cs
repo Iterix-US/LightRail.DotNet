@@ -10,7 +10,7 @@ namespace LightRail.DotNet.Abstractions
         string WriteAllText(string path, string contents);
         string GetFullPath(string path);
         string GetDirectoryName(string filePath);
-        FileStream Create(string filePath);
+        Stream Create(string filePath);
         DirectoryInfo CreateDirectory(string path);
     }
 }

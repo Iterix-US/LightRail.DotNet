@@ -51,7 +51,7 @@ namespace LightRail.DotNet.FileManagement
             catch (Exception ex)
             {
                 Debug.WriteLine(ex);
-                throw;
+                throw new FileNotFoundException("Configuration file could not be created", ex);
             }
         }
 

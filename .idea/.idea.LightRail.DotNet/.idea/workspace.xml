@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="c75cf1a3-8307-4294-9690-0fa0c8a83ef8" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/LightRail.DotNet/LightRail.DotNet.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/LightRail.DotNet/LightRail.DotNet.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LightRail.DotNet/SecurityUtilities/PasswordUtility.cs" beforeDir="false" afterPath="$PROJECT_DIR$/LightRail.DotNet/SecurityUtilities/PasswordUtility.cs" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="DpaMonitoringSettings">
+    <option name="firstShow" value="false" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 5
+}]]></component>
+  <component name="ProjectId" id="2uhjHxW70Ffcyl4VduD5SJyVkr0" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "6b4d57ed-0f47-47b5-adef-8e5ebe7e6752.executor": "Debug",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "feature/security-and-other-extensions",
+    "ignore.virus.scanning.warn.message": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="c75cf1a3-8307-4294-9690-0fa0c8a83ef8" name="Changes" comment="" />
+      <created>1742707616306</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1742707616306</updated>
+      <workItem from="1742707617870" duration="9817000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="UnitTestsCoverage.Settings">
+    <option name="coveragePercentColumnWidth" value="55" />
+    <option name="sortOrder" value="DESCENDING" />
+    <option name="sortedColumn" value="1" />
+    <option name="symbolColumnWidth" value="359" />
+    <coverage-tree-state>
+      <expand>
+        <path>
+          <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
+          <item name="Total 99% 6/966" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+        </path>
+        <path>
+          <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
+          <item name="Total 99% 6/966" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="LightRail.DotNet 99% 4/361" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+        </path>
+        <path>
+          <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
+          <item name="Total 99% 6/966" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="LightRail.DotNet 99% 4/361" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="(1.0.0.0, .NETStandard,Version=v2.0) 99% 4/361" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+        </path>
+        <path>
+          <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
+          <item name="Total 99% 6/966" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="LightRail.DotNet 99% 4/361" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="(1.0.0.0, .NETStandard,Version=v2.0) 99% 4/361" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="LightRail.DotNet 99% 4/361" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+        </path>
+        <path>
+          <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
+          <item name="Total 99% 6/966" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="LightRail.DotNet 99% 4/361" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="(1.0.0.0, .NETStandard,Version=v2.0) 99% 4/361" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="LightRail.DotNet 99% 4/361" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="FileManagement 92% 4/51" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+        </path>
+        <path>
+          <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
+          <item name="Total 99% 6/966" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="LightRail.DotNet 99% 4/361" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="(1.0.0.0, .NETStandard,Version=v2.0) 99% 4/361" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="LightRail.DotNet 99% 4/361" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="FileManagement 92% 4/51" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="ConfigurationLoader 92% 4/51" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+        </path>
+      </expand>
+      <select />
+    </coverage-tree-state>
+  </component>
+  <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="feature/security-and-other-extensions" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+  </component>
+</project>
