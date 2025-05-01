@@ -84,3 +84,16 @@ At **Iterix**, we build solutions that turn complexity into clarity. Our focus i
 Learn more about us at [iterix.net](https://iterix.net).
 
 **Iterix:** *One step at a time.*
+
+---
+
+### Future Features
+
+- Interface wrappers for static classes
+  1. Allows for unit testing to be more fluid
+  2. Does impose a memory usage overhead, but may be worth the cost to ensure functional stability
+- AI-assisted translations
+  1. Still thinking about this one.
+  2. I'm usually pretty hesitent about implementing AI tooling
+  3. Would need to be able to cache/store translations locally or to a local area network device in case of internet outage
+  
