@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.Extensions.Logging;
 
 namespace LightRail.DotNet.SecurityUtilities
 {
@@ -44,7 +44,7 @@ namespace LightRail.DotNet.SecurityUtilities
                 Convert.ToBase64String(hash)
             );
         }
-        
+
         /// <summary>
         /// Verifies whether the provided password matches the stored hash.
         /// </summary>
@@ -53,8 +53,9 @@ namespace LightRail.DotNet.SecurityUtilities
         /// A previously generated password hash string in the format:
         /// <c>PBKDF2-SHA256:iterations:base64-salt:base64-hash</c>.
         /// </param>
+        /// <param name="logger"></param>
         /// <returns><c>true</c> if the password matches the stored hash; otherwise, <c>false</c>.</returns>
-        public static bool VerifyPassword(string password, string storedHash)
+        public static bool VerifyPassword(string password, string storedHash, ILogger logger = null)
         {
             try
             {
@@ -71,7 +72,7 @@ namespace LightRail.DotNet.SecurityUtilities
 
                 if (algorithm != Algorithm)
                 {
-                    Debug.WriteLine("Invalid algorithm");
+                    logger?.LogError("Invalid algorithm");
                     return false;
                 }
 
@@ -80,7 +81,7 @@ namespace LightRail.DotNet.SecurityUtilities
             }
             catch (Exception ex)
             {
-                Debug.Write(ex);
+                logger?.LogError(ex, "Error verifying password");
                 return false;
             }
         }
@@ -90,12 +91,13 @@ namespace LightRail.DotNet.SecurityUtilities
         /// </summary>
         /// <param name="input">The first byte array.</param>
         /// <param name="hash">The second byte array to compare against.</param>
+        /// <param name="logger"></param>
         /// <returns><c>true</c> if both arrays are equal in content and length; otherwise, <c>false</c>.</returns>
-        public static bool FixedTimeEquals(byte[] input, byte[] hash)
+        public static bool FixedTimeEquals(byte[] input, byte[] hash, ILogger logger = null)
         {
             if (input.Length != hash.Length)
             {
-                Debug.WriteLine("Invalid hash length");
+                logger?.LogError("Invalid hash length");
                 return false;
             }
 
@@ -107,7 +109,7 @@ namespace LightRail.DotNet.SecurityUtilities
 
             return result == 0;
         }
-        
+
         /// <summary>
         /// Derives a cryptographic key using PBKDF2 with HMAC-SHA256.
         /// </summary>

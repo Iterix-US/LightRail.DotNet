@@ -6,6 +6,9 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Xml.Serialization;
+using Microsoft.Extensions.Logging;
+using static System.Double;
+using static System.Int32;
 
 namespace LightRail.DotNet.Extensions
 {
@@ -76,7 +79,7 @@ namespace LightRail.DotNet.Extensions
         /// <returns>True if the conversion was successful</returns>
         public static bool ToInt32(this string baseString, out int convertedValue)
         {
-            return Int32.TryParse(baseString, out convertedValue);
+            return TryParse(baseString, out convertedValue);
         }
 
         /// <summary>
@@ -87,7 +90,7 @@ namespace LightRail.DotNet.Extensions
         /// <returns>True if the conversion was successful</returns>
         public static bool ToInt64(this string baseString, out long convertedValue)
         {
-            return Int64.TryParse(baseString, out convertedValue);
+            return long.TryParse(baseString, out convertedValue);
         }
 
         /// <summary>
@@ -98,7 +101,7 @@ namespace LightRail.DotNet.Extensions
         /// <returns>True if the conversion was successful</returns>
         public static bool ToDouble(this string baseString, out double convertedValue)
         {
-            return Double.TryParse(baseString, out convertedValue);
+            return TryParse(baseString, out convertedValue);
         }
 
         /// <summary>
@@ -168,9 +171,10 @@ namespace LightRail.DotNet.Extensions
         /// </summary>
         /// <typeparam name="T">The XML string being deserialized into an object</typeparam>
         /// <param name="xmlString">The XML string being deserialized into an object</param>
+        /// <param name="logger"></param>
         /// <returns>The deserialized and hydrated object</returns>
         /// <exception cref="InvalidOperationException">Converting from string to given type experienced an error.</exception>
-        public static T FromXmlToType<T>(this string xmlString)
+        public static T FromXmlToType<T>(this string xmlString, ILogger logger = null)
         {
             try
             {
@@ -182,6 +186,7 @@ namespace LightRail.DotNet.Extensions
             }
             catch (InvalidOperationException ex)
             {
+                logger?.LogError(ex, "Failed to deserialize XML to type {TypeName}", typeof(T).Name);
                 throw new InvalidOperationException($"Error deserializing XML to {typeof(T)}.", ex);
             }
         }
