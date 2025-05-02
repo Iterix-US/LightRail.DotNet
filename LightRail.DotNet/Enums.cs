@@ -23,6 +23,9 @@ namespace LightRail.DotNet
         [Description("Night")] Night, // 9:00 PM - 11:59 PM
     }
 
+    /// <summary>
+    /// Represents the logging levels used in the application.
+    /// </summary>
     public enum LoggingLevel
     {
         Verbose = 0,
@@ -33,13 +36,15 @@ namespace LightRail.DotNet
         Fatal = 5
     }
 
+    /// <summary>
+    /// Represents the intervals at which log files can be rolled over.
+    /// </summary>
     public enum LogRollInterval
     {
         Indefinite = 0,
         Yearly = 1,
         Monthly = 2,
-        Weekly = 3,
-        Daily = 4,
-        Hourly = 5
+        Daily = 3,
+        Hourly = 4
     }
 }
