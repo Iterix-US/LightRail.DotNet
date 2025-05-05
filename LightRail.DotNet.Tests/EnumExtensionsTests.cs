@@ -56,7 +56,7 @@ namespace LightRail.DotNet.Tests
             var values = dummy.GetAllValues();
 
             // Assert
-            values.ShouldBe(new List<TestEnum> { TestEnum.First, TestEnum.Second, TestEnum.Third });
+            values.ShouldBe([TestEnum.First, TestEnum.Second, TestEnum.Third]);
         }
     }
 }

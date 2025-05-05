@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using LightRail.DotNet.Extensions;
@@ -10,6 +11,8 @@ using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace LightRail.DotNet.Logging
 {
+    // Tested via <see cref="LoggerFactoryBuilder"/>, so the derived logger class doesn't need testing directly.
+    [ExcludeFromCodeCoverage]
     public class SerilogBuilder : LoggerBuilderBase<SerilogBuilder, ILogger, LoggerConfiguration>
     {
         public override LoggerConfiguration Configuration { get; internal set; } = new LoggerConfiguration();

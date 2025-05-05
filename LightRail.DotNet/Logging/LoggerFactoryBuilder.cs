@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace LightRail.DotNet.Logging
 {
@@ -136,7 +137,7 @@ namespace LightRail.DotNet.Logging
         /// Builds a Serilog configuration based on the settings provided in this builder.
         /// </summary>
         /// <returns></returns>
-        public SerilogBuilder BuildSerilog()
+        public ILogger BuildSerilog()
         {
             var builder = new SerilogBuilder()
                 .WithMinimumLevel(_logLevel)
@@ -155,14 +156,14 @@ namespace LightRail.DotNet.Logging
             if (_configuration != null)
                 builder.FromConfiguration(_configuration);
 
-            return builder;
+            return builder.Build();
         }
 
         /// <summary>
         /// Builds an NLog configuration based on the settings provided in this builder.
         /// </summary>
         /// <returns></returns>
-        public NLogBuilder BuildNLog()
+        public ILogger BuildNLog()
         {
             var builder = new NLogBuilder()
                 .WithMinimumLevel(_logLevel)
@@ -181,7 +182,7 @@ namespace LightRail.DotNet.Logging
             if (_configuration != null)
                 builder.FromConfiguration(_configuration);
 
-            return builder;
+            return builder.Build();
         }
     }
 }
