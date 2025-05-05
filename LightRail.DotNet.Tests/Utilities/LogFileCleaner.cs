@@ -1,7 +1,9 @@
-﻿using LightRail.DotNet.Tests.Interfaces;
+﻿using System.Diagnostics.CodeAnalysis;
+using LightRail.DotNet.Tests.Interfaces;
 
 namespace LightRail.DotNet.Tests.Utilities
 {
+    [ExcludeFromCodeCoverage]
     public class LogFileCleaner : ILogFileCleaner
     {
         public bool TryDelete(string filePath)
