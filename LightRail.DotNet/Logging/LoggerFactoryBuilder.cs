@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using LightRail.DotNet.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -23,6 +24,7 @@ namespace LightRail.DotNet.Logging
         private string _outputTemplate = "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}{Exception}";
         private string _category = Assembly.GetExecutingAssembly().GetName().Name ?? "AppLogger";
         private IConfiguration _configuration;
+        protected IDirectoryManagement FileManager { get; }
 
         /// <summary>
         /// Initializes a new instance of the LoggerFactoryBuilder class.

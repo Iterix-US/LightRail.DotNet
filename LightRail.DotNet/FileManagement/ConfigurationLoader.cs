@@ -117,13 +117,9 @@ namespace LightRail.DotNet.FileManagement
                 return;
             }
 
-            var directoryInfo = _fileManager?.CreateDirectory(path) ?? Directory.CreateDirectory(path);
-
-            if (directoryInfo == null)
-            {
-                logger?.LogError($"The directory {path} could not be created.");
-                throw new DirectoryNotFoundException($"The directory {path} could not be created.");
-            }
+            _ = _fileManager?.CreateDirectory(path) ?? Directory.CreateDirectory(path);
+            logger?.LogError($"The directory {path} could not be created.");
+            throw new DirectoryNotFoundException($"The directory {path} could not be created.");
         }
     }
 }

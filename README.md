@@ -89,11 +89,11 @@ Learn more about us at [iterix.net](https://iterix.net).
 
 ### Future Features
 
-- Interface wrappers for static classes
+- Interface + wrapper classes for externally dependent tooling
   1. Allows for unit testing to be more fluid
   2. Does impose a memory usage overhead, but may be worth the cost to ensure functional stability
+  3. Mainly for namespaces like Registry, File, Directory, etc.
 - AI-assisted translations
   1. Still thinking about this one.
   2. I'm usually pretty hesitent about implementing AI tooling
   3. Would need to be able to cache/store translations locally or to a local area network device in case of internet outage
-  

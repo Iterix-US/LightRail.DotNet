@@ -1,4 +1,5 @@
 ﻿using System;
+using LightRail.DotNet.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,6 +19,11 @@ namespace LightRail.DotNet.Logging.LoggerInterfaces
         /// Gets the current logger configuration, which includes settings such as output paths, log levels, and other configurations.
         /// </summary>
         TLoggerConfiguration Configuration { get; }
+
+        /// <summary>
+        /// Wraps file and directory management functionality to allow for mocking and testing.
+        /// </summary>
+        IDirectoryManagement FileManager { get; }
 
         /// <summary>
         /// Gets a value indicating whether the logger has been built and is ready for use.

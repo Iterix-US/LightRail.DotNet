@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
+using LightRail.DotNet.Abstractions;
 using LightRail.DotNet.Logging.LoggerInterfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,6 +42,11 @@ namespace LightRail.DotNet.Logging
         /// Gets the current logger configuration, which includes settings such as output paths, log levels, and other configurations.
         /// </summary>
         public abstract TConfiguration Configuration { get; internal set; }
+
+        /// <summary>
+        /// The file manager used for handling file operations. This is useful for abstracting file system interactions, such as checking if a file exists or creating directories.
+        /// </summary>
+        public IDirectoryManagement FileManager { get; }
 
         /// <summary>
         /// Indicates whether the logger has been built. This is used to prevent multiple builds of the same logger configuration.
