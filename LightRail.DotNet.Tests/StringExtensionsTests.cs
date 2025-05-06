@@ -1,4 +1,5 @@
-﻿using LightRail.DotNet.Extensions;
+﻿using System.Text;
+using LightRail.DotNet.Extensions;
 using LightRail.DotNet.Tests.TestObjects;
 using Shouldly;
 
@@ -253,6 +254,79 @@ namespace LightRail.DotNet.Tests
             // Act & Assert
             var exception = Should.Throw<InvalidOperationException>(() => invalidXmlString.FromXmlToType<SerializationObject>());
             exception.Message.ShouldContain($"Error deserializing XML to {typeof(SerializationObject)}.");
+        }
+        
+        [Fact]
+        public void IsValidEnumValue_ShouldReturnTrue_WhenValidEnumString()
+        {
+            var input = "ValueOne";
+            var success = input.IsValidEnumValue<SampleEnum>(out var result);
+    
+            success.ShouldBeTrue();
+            result.ShouldBe(SampleEnum.ValueOne);
+        }
+
+        [Fact]
+        public void IsValidEnumValue_ShouldReturnFalse_WhenInvalidEnumString()
+        {
+            var input = "Invalid";
+            var success = input.IsValidEnumValue<SampleEnum>(out _);
+    
+            success.ShouldBeFalse();
+        }
+
+        [Fact]
+        public void GetEnumFromDescription_ShouldReturnEnum_WhenDescriptionMatches()
+        {
+            var input = "First Option";
+            var result = input.GetEnumFromDescription<SampleEnum>();
+
+            result.ShouldBe(SampleEnum.ValueOne);
+        }
+
+        [Fact]
+        public void GetEnumFromDescription_ShouldReturnNull_WhenNoMatch()
+        {
+            var input = "Nonexistent";
+            var result = input.GetEnumFromDescription<SampleEnum>();
+
+            result.ShouldBeNull();
+        }
+
+        [Fact]
+        public void EncodeAsHttp_ShouldUrlEncodeString()
+        {
+            var input = "this is a test!";
+            var result = input.EncodeAsHttp();
+
+            result.ShouldBe("this%20is%20a%20test%21");
+        }
+
+        [Fact]
+        public void ToSha256_ShouldReturnExpectedHash()
+        {
+            var input = "test";
+            var result = input.ToSha256();
+
+            result.ShouldBe("n4bQgYhMfWWaL+qgxVrQFaO/TxsrC4Is0V1sFbDwCgg=");
+        }
+
+        [Fact]
+        public void ToHexString_ShouldConvertStringToHex()
+        {
+            var input = "abc";
+            var result = input.ToHexString();
+
+            result.ShouldBe("616263");
+        }
+
+        [Fact]
+        public void ToHexString_ShouldRespectEncodingParameter()
+        {
+            var input = "abc";
+            var result = input.ToHexString(Encoding.ASCII);
+
+            result.ShouldBe("616263");
         }
     }
 }

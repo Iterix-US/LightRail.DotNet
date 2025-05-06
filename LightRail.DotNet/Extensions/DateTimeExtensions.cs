@@ -96,5 +96,64 @@ namespace LightRail.DotNet.Extensions
                 additionDateTime.Millisecond
             );
         }
+
+        public static bool IsWeekend(this DateTime date)
+        {
+            return date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday;
+        }
+
+        public static bool IsWeekday(this DateTime date)
+        {
+            return !date.IsWeekend();
+        }
+
+        /// <summary>
+        /// Give the difference between "Now" and the give time in a human-readable format.
+        /// </summary>
+        /// <param name="date"></param>
+        /// <returns></returns>
+        public static string ToReadableTimeAgo(this DateTime date)
+        {
+            var timespan = DateTime.UtcNow - date;
+
+            if (timespan.TotalSeconds < 60)
+            {
+                return $"{timespan.Seconds} seconds ago";
+            }
+
+            if (timespan.TotalMinutes < 60)
+            {
+                return $"{timespan.Minutes} minutes ago";
+            }
+
+            return timespan.TotalHours < 24 ?
+                $"{timespan.Hours} hours ago" :
+                $"{timespan.Days} days ago";
+        }
+
+        /// <summary>
+        /// Determines the friendly-name of the given time based on the hour of the day.
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        public static TimeOfDay GetTimeOfDay(this DateTime dateTime)
+        {
+            var hour = dateTime.Hour;
+
+            if (hour >= 0 && hour < 6)
+                return TimeOfDay.EarlyMorning;
+            if (hour >= 6 && hour < 7)
+                return TimeOfDay.Dawn;
+            if (hour >= 7 && hour < 12)
+                return TimeOfDay.Morning;
+            if (hour >= 12 && hour < 17)
+                return TimeOfDay.Afternoon;
+            if (hour >= 17 && hour < 18)
+                return TimeOfDay.Dusk;
+            if (hour >= 18 && hour < 21)
+                return TimeOfDay.Evening;
+
+            return TimeOfDay.Night;
+        }
     }
 }

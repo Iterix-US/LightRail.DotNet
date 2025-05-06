@@ -1,7 +1,14 @@
-﻿using System;
+﻿﻿using System;
+using System.ComponentModel;
 using System.IO;
+using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using System.Xml.Serialization;
+using Microsoft.Extensions.Logging;
+using static System.Double;
+using static System.Int32;
 
 namespace LightRail.DotNet.Extensions
 {
@@ -72,7 +79,7 @@ namespace LightRail.DotNet.Extensions
         /// <returns>True if the conversion was successful</returns>
         public static bool ToInt32(this string baseString, out int convertedValue)
         {
-            return Int32.TryParse(baseString, out convertedValue);
+            return TryParse(baseString, out convertedValue);
         }
 
         /// <summary>
@@ -83,7 +90,7 @@ namespace LightRail.DotNet.Extensions
         /// <returns>True if the conversion was successful</returns>
         public static bool ToInt64(this string baseString, out long convertedValue)
         {
-            return Int64.TryParse(baseString, out convertedValue);
+            return long.TryParse(baseString, out convertedValue);
         }
 
         /// <summary>
@@ -94,7 +101,7 @@ namespace LightRail.DotNet.Extensions
         /// <returns>True if the conversion was successful</returns>
         public static bool ToDouble(this string baseString, out double convertedValue)
         {
-            return Double.TryParse(baseString, out convertedValue);
+            return TryParse(baseString, out convertedValue);
         }
 
         /// <summary>
@@ -164,9 +171,10 @@ namespace LightRail.DotNet.Extensions
         /// </summary>
         /// <typeparam name="T">The XML string being deserialized into an object</typeparam>
         /// <param name="xmlString">The XML string being deserialized into an object</param>
+        /// <param name="logger"></param>
         /// <returns>The deserialized and hydrated object</returns>
         /// <exception cref="InvalidOperationException">Converting from string to given type experienced an error.</exception>
-        public static T FromXmlToType<T>(this string xmlString)
+        public static T FromXmlToType<T>(this string xmlString, ILogger logger = null)
         {
             try
             {
@@ -178,8 +186,77 @@ namespace LightRail.DotNet.Extensions
             }
             catch (InvalidOperationException ex)
             {
+                logger?.LogError(ex, "Failed to deserialize XML to type {TypeName}", typeof(T).Name);
                 throw new InvalidOperationException($"Error deserializing XML to {typeof(T)}.", ex);
             }
+        }
+
+
+        /// <summary>
+        /// Determines if a string is a valid Enum value
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public static bool IsValidEnumValue<T>(this string value, out T result) where T : struct, Enum
+        {
+            return Enum.TryParse(value, out result);
+        }
+
+        /// <summary>
+        /// Converts a string to an enum value based on the description attribute of the Enum value
+        /// Requires the enum to have values defined on its fields with the Description attribute
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="description"></param>
+        /// <returns></returns>
+        public static T? GetEnumFromDescription<T>(this string description) where T : struct, Enum
+        {
+            var type = typeof(T);
+
+            foreach (var field in type.GetFields())
+            {
+                var attribute = field.GetCustomAttribute<DescriptionAttribute>();
+                if (attribute != null && attribute.Description.Equals(description, StringComparison.OrdinalIgnoreCase))
+                {
+                    return (T)field.GetValue(null);
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Encodes a string as a URL
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string EncodeAsHttp(this string value)
+        {
+            return Uri.EscapeDataString(value);
+        }
+
+        /// <summary>
+        /// Hashes a string using SHA256
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static string ToSha256(this string input)
+        {
+            using (var sha256 = SHA256.Create())
+            {
+                var bytes = Encoding.UTF8.GetBytes(input);
+                return Convert.ToBase64String(sha256.ComputeHash(bytes));
+            }
+        }
+
+        public static string ToHexString(this string input, Encoding encoding = null)
+        {
+            var intendedEncoding = encoding ?? Encoding.UTF8;
+            var bytes = intendedEncoding.GetBytes(input);
+
+            return BitConverter.ToString(bytes).Replace("-", "").ToLowerInvariant();
         }
     }
 }
