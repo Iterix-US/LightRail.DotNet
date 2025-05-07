@@ -6,7 +6,7 @@ Defines a generic contract for building and configuring logging frameworks in a 
 
 ## 📦 Namespace
 
-`LightRail.DotNet.Logging.LoggerInterfaces`
+`SeroGlint.DotNet.Logging.LoggerInterfaces`
 
 ---
 

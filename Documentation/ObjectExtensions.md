@@ -6,7 +6,7 @@ Provides serialization extensions for objects in C#, allowing for quick conversi
 
 ## 📦 Namespace
 
-`LightRail.DotNet.Extensions`
+`SeroGlint.DotNet.Extensions`
 
 ## 🧪 Notes
 

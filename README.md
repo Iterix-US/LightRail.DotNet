@@ -1,13 +1,13 @@
-# LightRail.DotNet
+# SeroGlint.DotNet
 
 **A powerful yet lightweight toolkit that simplifies, accelerates, and enhances your .NET development.**
 
 ---
 
-## 🚦 **What is LightRail.DotNet?**
+## 🚦 **What is SeroGlint.DotNet?**
 
 At Iterix, we know that the repetitive tasks in software development slow teams down.  
-**LightRail.DotNet** is our solution—a carefully designed library filled with elegant extension methods, converters, serialization utilities, and common tools tailored specifically for .NET developers. Our mission is straightforward: eliminate boilerplate, reduce friction, and enable your team to build better software, faster.
+**SeroGlint.DotNet** is our solution—a carefully designed library filled with elegant extension methods, converters, serialization utilities, and common tools tailored specifically for .NET developers. Our mission is straightforward: eliminate boilerplate, reduce friction, and enable your team to build better software, faster.
 
 ---
 
@@ -95,7 +95,7 @@ We take quality seriously. Each component is thoroughly unit tested, and we cont
 
 ## 📜 **License**
 
-LightRail.DotNet is proudly licensed under the **Mozilla Public License 2.0 (MPL-2.0)**, ensuring open usage while clearly defining how contributions and modifications should happen.  
+SeroGlint.DotNet is proudly licensed under the **Mozilla Public License 2.0 (MPL-2.0)**, ensuring open usage while clearly defining how contributions and modifications should happen.  
 See the [LICENSE](LICENSE) file for full details.
 
 ---

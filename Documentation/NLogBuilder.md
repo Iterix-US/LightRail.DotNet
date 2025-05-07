@@ -8,7 +8,7 @@ The `NLogBuilder` class provides a configurable way to create and manage NLog-ba
 
 ## 📦 Namespace
 
-`LightRail.DotNet.Logging`
+`SeroGlint.DotNet.Logging`
 
 ---
 

@@ -1,13 +1,13 @@
 # LoggerFactoryBuilder
 
-The `LoggerFactoryBuilder` class in `LightRail.DotNet.Logging` provides a unified, fluent API for constructing and configuring logger instances using either Serilog or NLog. This class simplifies logger creation by exposing configurable options through method chaining.
+The `LoggerFactoryBuilder` class in `SeroGlint.DotNet.Logging` provides a unified, fluent API for constructing and configuring logger instances using either Serilog or NLog. This class simplifies logger creation by exposing configurable options through method chaining.
 
 ---
 
 ## 📦 Namespace
 
 ```csharp
-LightRail.DotNet.Logging
+SeroGlint.DotNet.Logging
 ```
 
 ## ⚙️ Summary

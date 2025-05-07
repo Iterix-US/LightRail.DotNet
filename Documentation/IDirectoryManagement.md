@@ -6,7 +6,7 @@ An interface designed to abstract basic file and directory operations, useful fo
 
 ## 📦 Namespace
 
-`LightRail.DotNet.Abstractions`
+`SeroGlint.DotNet.Abstractions`
 
 ---
 

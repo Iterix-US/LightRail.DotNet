@@ -6,7 +6,7 @@ Provides extension methods to enhance working with enums, including value listin
 
 ## 📦 Namespace
 
-`LightRail.DotNet.Extensions`
+`SeroGlint.DotNet.Extensions`
 
 ---
 

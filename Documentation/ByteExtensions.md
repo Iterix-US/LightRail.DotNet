@@ -6,7 +6,7 @@ Provides a utility method for converting byte arrays into hexadecimal string rep
 
 ## 📦 Namespace
 
-`LightRail.DotNet.Extensions`
+`SeroGlint.DotNet.Extensions`
 
 ---
 

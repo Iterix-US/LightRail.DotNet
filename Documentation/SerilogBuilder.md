@@ -1,6 +1,6 @@
 # SerilogBuilder
 
-Provides a fluent API for configuring and building a Serilog-based logger using the LightRail.DotNet framework.
+Provides a fluent API for configuring and building a Serilog-based logger using the SeroGlint.DotNet framework.
 
 **Note**: This class is designed to be used through the [LoggerFactoryBuilder](LoggerFactoryBuilder.md) class. Feel free to use this class, but the fluent syntax of the LoggerFactoryBuilder allows for easier switching between providers.
 
@@ -8,7 +8,7 @@ Provides a fluent API for configuring and building a Serilog-based logger using 
 
 ## 📦 Namespace
 
-`LightRail.DotNet.Logging`
+`SeroGlint.DotNet.Logging`
 
 ---
 

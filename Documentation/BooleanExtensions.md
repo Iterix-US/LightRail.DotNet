@@ -6,7 +6,7 @@ Provides utility extension methods for converting `bool` values to common repres
 
 ## 📦 Namespace
 
-LightRail.DotNet.Extensions
+SeroGlint.DotNet.Extensions
 
 ## 🧪 Notes
 

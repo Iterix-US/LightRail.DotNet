@@ -7,7 +7,7 @@ Compatible with .NET Standard 2.0 for wide support.
 
 ## 📦 Namespace
 
-`LightRail.DotNet.SecurityUtilities`
+`SeroGlint.DotNet.SecurityUtilities`
 
 ## 🔐 Purpose
 

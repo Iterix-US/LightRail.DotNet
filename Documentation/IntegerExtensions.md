@@ -6,7 +6,7 @@ Provides helper methods for `int` values that simplify common numerical checks s
 
 ## 📦 Namespace
 
-`LightRail.DotNet.Extensions`
+`SeroGlint.DotNet.Extensions`
 
 ---
 

@@ -6,7 +6,7 @@ Provides a utility class for loading and saving configuration files in JSON form
 
 ## 📦 Namespace
 
-`LightRail.DotNet.FileManagement`
+`SeroGlint.DotNet.FileManagement`
 
 ---
 

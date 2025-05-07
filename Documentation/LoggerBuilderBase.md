@@ -6,7 +6,7 @@ Provides a base implementation of a strongly-typed, extensible logging builder i
 
 ## 📦 Namespace
 
-`LightRail.DotNet.Logging`
+`SeroGlint.DotNet.Logging`
 
 ## 🧰 Inheritance
 

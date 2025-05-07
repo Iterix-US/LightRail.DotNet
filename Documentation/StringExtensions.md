@@ -6,7 +6,7 @@ Provides extension methods for the `string` data type in C#. These methods simpl
 
 ## 📦 Namespace
 
-`LightRail.DotNet.Extensions`
+`SeroGlint.DotNet.Extensions`
 
 ---
 

@@ -6,7 +6,7 @@ Provides utility extension methods for `decimal` values to evaluate, convert, an
 
 ## 📦 Namespace
 
-`LightRail.DotNet.Extensions`
+`SeroGlint.DotNet.Extensions`
 
 ---
 
