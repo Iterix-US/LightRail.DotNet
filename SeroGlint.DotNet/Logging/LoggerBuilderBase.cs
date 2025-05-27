@@ -46,7 +46,7 @@ namespace SeroGlint.DotNet.Logging
         /// <summary>
         /// The file manager used for handling file operations. This is useful for abstracting file system interactions, such as checking if a file exists or creating directories.
         /// </summary>
-        public IDirectoryManagement FileManager { get; }
+        public IDirectoryManagement FileManager { get; internal set; }
 
         /// <summary>
         /// Indicates whether the logger has been built. This is used to prevent multiple builds of the same logger configuration.

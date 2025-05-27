@@ -4,6 +4,10 @@ using SeroGlint.DotNet.Tests.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NLog;
+using NSubstitute;
+using SeroGlint.DotNet.Abstractions;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
+using Serilog;
 
 namespace SeroGlint.DotNet.Tests
 {
@@ -15,7 +19,9 @@ namespace SeroGlint.DotNet.Tests
         public LoggerFactoryBuilderTests()
         {
             if (!Directory.Exists(_testLogPath))
+            {
                 Directory.CreateDirectory(_testLogPath);
+            }
         }
 
         public void Dispose()
@@ -126,6 +132,21 @@ namespace SeroGlint.DotNet.Tests
             var logger = builder.BuildNLog();
 
             Assert.NotNull(logger);
+        }
+
+        [Fact]
+        public void FileManager_Property_ReturnsInjectedInstance()
+        {
+            // Arrange
+            var mockManager = Substitute.For<IDirectoryManagement>();
+            var loggerBuilder = new LoggerFactoryBuilder(mockManager)
+                .EnableConsoleOutput()
+                .EnableFileOutput(createLogPath: true, logPath: _testLogPath, logName: "TestLog", logExtension: "log");
+
+            var actual = loggerBuilder.FileManager;
+
+            // Assert
+            Assert.NotNull(actual);
         }
     }
 }
