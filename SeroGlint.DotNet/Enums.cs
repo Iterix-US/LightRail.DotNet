@@ -14,13 +14,20 @@ namespace SeroGlint.DotNet
     /// </summary>
     public enum TimeOfDay
     {
-        [Description("Early Morning")] EarlyMorning, // 12:00 AM - 5:59 AM
-        [Description("Dawn")] Dawn, // 6:00 AM - 6:59 AM
-        [Description("Morning")] Morning, // 7:00 AM - 11:59 AM
-        [Description("Afternoon")] Afternoon, // 12:00 PM - 4:59 PM
-        [Description("Dusk")] Dusk, // 5:00 PM - 5:59 PM
-        [Description("Evening")] Evening, // 6:00 PM - 8:59 PM
-        [Description("Night")] Night, // 9:00 PM - 11:59 PM
+        [Description("Early Morning")] 
+        EarlyMorning,
+        [Description("Dawn")] 
+        Dawn,
+        [Description("Morning")] 
+        Morning,
+        [Description("Afternoon")] 
+        Afternoon,
+        [Description("Dusk")] 
+        Dusk,
+        [Description("Evening")] 
+        Evening,
+        [Description("Night")] 
+        Night
     }
 
     /// <summary>
@@ -28,11 +35,17 @@ namespace SeroGlint.DotNet
     /// </summary>
     public enum LoggingLevel
     {
+        [Description("Verbose")]
         Verbose = 0,
+        [Description("Debug")]
         Debug = 1,
+        [Description("Information")]
         Information = 2,
+        [Description("Warning")]
         Warning = 3,
+        [Description("Error")]
         Error = 4,
+        [Description("Fatal")]
         Fatal = 5
     }
 
@@ -41,10 +54,24 @@ namespace SeroGlint.DotNet
     /// </summary>
     public enum LogRollInterval
     {
+        [Description("Indefinite")]
         Indefinite = 0,
+        [Description("Yearly")]
         Yearly = 1,
+        [Description("Monthly")]
         Monthly = 2,
+        [Description("Daily")]
         Daily = 3,
+        [Description("Hourly")]
         Hourly = 4
     }
+
+    public enum PipeServerMode
+    {
+        [Description("Momentary")]
+        Momentary,
+        [Description("Perpetual")]
+        Perpetual
+    }
+
 }
