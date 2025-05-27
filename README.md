@@ -76,6 +76,7 @@ You can find detailed documentation for each class or utility in the [`Documenta
 - [PasswordUtility](./Documentation/PasswordUtility.md)
 - [Enums](./Documentation/Enums.md)
 - [IDirectoryManagement](./Documentation/IDirectoryManagement.md)
+- [DirectoryManagementWrapper](./Documentation/DirectoryManagementWrapper.md)
 
 ### 📝 Logging System
 
