@@ -15,9 +15,10 @@ namespace SeroGlint.DotNet.FileManagement
         /// Initializes a new instance of the <see cref="ConfigurationLoader"/> class.
         /// </summary>
         /// <param name="fileManager"></param>
-        public ConfigurationLoader(IDirectoryManagement fileManager = null)
+        /// <param name="logger"></param>
+        public ConfigurationLoader(IDirectoryManagement fileManager = null, ILogger logger = null)
         {
-            _fileManager = fileManager;
+            _fileManager = fileManager ?? new DirectoryManagementWrapper(logger);
         }
 
         /// <summary>
@@ -28,14 +29,14 @@ namespace SeroGlint.DotNet.FileManagement
         /// <returns></returns>
         public T LoadJsonConfiguration<T>(string filePath) where T : class
         {
-            var fileExists = _fileManager?.Exists(filePath) ?? File.Exists(filePath);
+            var fileExists = _fileManager.Exists(filePath);
 
             if (!fileExists)
             {
                 return Activator.CreateInstance<T>();
             }
 
-            var json = _fileManager?.ReadAllText(filePath) ?? File.ReadAllText(filePath);
+            var json = _fileManager.ReadAllText(filePath) ?? File.ReadAllText(filePath);
             return JsonSerializer.Deserialize<T>(json) ?? Activator.CreateInstance<T>();
         }
 
@@ -53,17 +54,11 @@ namespace SeroGlint.DotNet.FileManagement
 
             try
             {
-                var file = _fileManager?.GetFullPath(filePath) ?? Path.GetFullPath(filePath);
-                var path = _fileManager?.GetDirectoryName(filePath) ?? Path.GetDirectoryName(file);
+                var file = _fileManager.GetFullPath(filePath) ?? Path.GetFullPath(filePath);
+                var path = _fileManager.GetDirectoryName(filePath) ?? Path.GetDirectoryName(file);
 
                 SafeguardDirectory(path);
                 SafeguardFile(file);
-
-                if (_fileManager == null)
-                {
-                    File.WriteAllText(file, json);
-                    return;
-                }
 
                 _fileManager.WriteAllText(file, json);
             }
@@ -83,14 +78,14 @@ namespace SeroGlint.DotNet.FileManagement
         [ExcludeFromCodeCoverage]
         private void SafeguardFile(string file, ILogger logger = null)
         {
-            var fileExists = _fileManager?.Exists(file) ?? File.Exists(file);
+            var fileExists = _fileManager.Exists(file);
 
             if (fileExists && _fileManager == null)
             {
                 return;
             }
 
-            var fileStream = _fileManager?.Create(file) ?? File.Create(file);
+            var fileStream = _fileManager.Create(file);
 
             if (fileStream == null)
             {
@@ -110,14 +105,20 @@ namespace SeroGlint.DotNet.FileManagement
         [ExcludeFromCodeCoverage]
         private void SafeguardDirectory(string path, ILogger logger = null)
         {
-            var directoryExists = _fileManager?.Exists(path) ?? Directory.Exists(path);
+            var directoryExists = _fileManager.Exists(path);
 
             if (directoryExists)
             {
                 return;
             }
 
-            _ = _fileManager?.CreateDirectory(path) ?? Directory.CreateDirectory(path);
+            var directoryInfo = _fileManager.CreateDirectory(path);
+
+            if (directoryInfo != null)
+            {
+                return;
+            }
+
             logger?.LogError($"The directory {path} could not be created.");
             throw new DirectoryNotFoundException($"The directory {path} could not be created.");
         }

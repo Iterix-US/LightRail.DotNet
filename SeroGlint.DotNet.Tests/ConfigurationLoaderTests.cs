@@ -109,6 +109,7 @@ namespace SeroGlint.DotNet.Tests
             fileManager.GetDirectoryName("config.json").Returns("folder");
             fileManager.Exists("folder").Returns(false);
             fileManager.Create("config.json").Returns(new MemoryStream());
+            fileManager.CreateDirectory("folder").Returns(new DirectoryInfo("folder"));
 
             var loader = new ConfigurationLoader(fileManager);
             loader.SaveJsonConfiguration("config.json", new TestConfig());
@@ -124,6 +125,7 @@ namespace SeroGlint.DotNet.Tests
             fileManager.GetFullPath("file.json").Returns("file.json");
             fileManager.GetDirectoryName("file.json").Returns(".");
             fileManager.Create("file.json").Returns(new MemoryStream());
+            fileManager.CreateDirectory(Arg.Any<string>()).Returns(new DirectoryInfo(".\\"));
 
             var loader = new ConfigurationLoader(fileManager);
             loader.SaveJsonConfiguration("file.json", new TestConfig());

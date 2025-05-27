@@ -251,12 +251,28 @@ namespace SeroGlint.DotNet.Extensions
             }
         }
 
+        /// <summary>
+        /// Converts a string to a hexadecimal representation.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
         public static string ToHexString(this string input, Encoding encoding = null)
         {
             var intendedEncoding = encoding ?? Encoding.UTF8;
             var bytes = intendedEncoding.GetBytes(input);
 
             return BitConverter.ToString(bytes).Replace("-", "").ToLowerInvariant();
+        }
+
+        /// <summary>
+        /// Checks if a string is null or whitespace.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static bool IsNullOrWhitespace(this string value)
+        {
+            return string.IsNullOrWhiteSpace(value);
         }
     }
 }
