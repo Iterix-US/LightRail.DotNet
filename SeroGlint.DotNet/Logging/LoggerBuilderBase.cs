@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
-using SeroGlint.DotNet.Abstractions;
-using SeroGlint.DotNet.Logging.LoggerInterfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SeroGlint.DotNet.Abstractions;
+using SeroGlint.DotNet.Logging.LoggerInterfaces;
 
 namespace SeroGlint.DotNet.Logging
 {

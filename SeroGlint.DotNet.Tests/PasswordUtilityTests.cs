@@ -1,8 +1,6 @@
-using System;
 using System.Text;
 using SeroGlint.DotNet.SecurityUtilities;
 using Shouldly;
-using Xunit;
 
 namespace SeroGlint.DotNet.Tests
 {
@@ -12,7 +10,7 @@ namespace SeroGlint.DotNet.Tests
         public void HashPassword_ShouldReturnDifferentHashes_ForSamePassword()
         {
             // Arrange
-            var password = "MySecurePassword";
+            const string password = "MySecurePassword";
 
             // Act
             var hash1 = PasswordUtility.HashPassword(password);
@@ -25,7 +23,7 @@ namespace SeroGlint.DotNet.Tests
         [Fact]
         public void VerifyPassword_ShouldReturnTrue_ForCorrectPassword()
         {
-            var password = "CorrectHorseBatteryStaple";
+            const string password = "CorrectHorseBatteryStaple";
             var hash = PasswordUtility.HashPassword(password);
 
             var result = PasswordUtility.VerifyPassword(password, hash);
@@ -36,8 +34,8 @@ namespace SeroGlint.DotNet.Tests
         [Fact]
         public void VerifyPassword_ShouldReturnFalse_ForIncorrectPassword()
         {
-            var correct = "Secure123!";
-            var wrong = "Insecure123!";
+            const string correct = "Secure123!";
+            const string wrong = "Insecure123!";
             var hash = PasswordUtility.HashPassword(correct);
 
             var result = PasswordUtility.VerifyPassword(wrong, hash);
@@ -48,7 +46,7 @@ namespace SeroGlint.DotNet.Tests
         [Fact]
         public void VerifyPassword_ShouldReturnFalse_ForTamperedHash()
         {
-            var password = "DoNotTamper";
+            const string password = "DoNotTamper";
             var hash = PasswordUtility.HashPassword(password);
 
             var parts = hash.Split(':');
@@ -63,7 +61,7 @@ namespace SeroGlint.DotNet.Tests
         [Fact]
         public void VerifyPassword_ShouldReturnFalse_ForMalformedHash()
         {
-            var malformed = "PBKDF2-SHA256:100000:this-is-not-base64";
+            const string malformed = "PBKDF2-SHA256:100000:this-is-not-base64";
 
             var result = PasswordUtility.VerifyPassword("anything", malformed);
 
@@ -84,8 +82,8 @@ namespace SeroGlint.DotNet.Tests
         [Fact]
         public void HashPassword_ShouldNormalizeUnicode()
         {
-            var composed = "ﬁ";             // U+FB01 (ligature)
-            var decomposed = "f\u0069";     // 'f' + 'i'
+            const string composed = "ﬁ"; // U+FB01 (ligature)
+            const string decomposed = "f\u0069"; // 'f' + 'i'
 
             var hash = PasswordUtility.HashPassword(composed);
             var result = PasswordUtility.VerifyPassword(decomposed, hash);
@@ -123,7 +121,7 @@ namespace SeroGlint.DotNet.Tests
         [Fact]
         public void Pbkdf2HmacSha256_ShouldReturnCorrectLength()
         {
-            var password = "secret";
+            const string password = "secret";
             var salt = new byte[16];
             new Random(123).NextBytes(salt);
 
@@ -135,7 +133,7 @@ namespace SeroGlint.DotNet.Tests
         [Fact]
         public void Pbkdf2HmacSha256_ShouldBeDeterministic_ForSameInputs()
         {
-            var password = "predictable";
+            const string password = "predictable";
             var salt = Encoding.UTF8.GetBytes("this-is-salt");
 
             var h1 = PasswordUtility.Pbkdf2HmacSha256(password, salt, 5000, 32);
@@ -148,8 +146,8 @@ namespace SeroGlint.DotNet.Tests
         public void VerifyPassword_ShouldReturnFalse_WhenSaltIsInvalidBase64()
         {
             // Arrange
-            var invalidSalt = "!!!!"; // invalid base64
-            var hash = $"PBKDF2-SHA256:100000:{invalidSalt}:aGVsbG93b3JsZA==";
+            const string invalidSalt = "!!!!"; // invalid base64
+            const string hash = $"PBKDF2-SHA256:100000:{invalidSalt}:aGVsbG93b3JsZA==";
 
             // Act
             var result = PasswordUtility.VerifyPassword("test", hash);
@@ -163,7 +161,7 @@ namespace SeroGlint.DotNet.Tests
         {
             // Arrange
             var salt = Convert.ToBase64String(Encoding.UTF8.GetBytes("salt123"));
-            var invalidHash = "%%%"; // not valid base64
+            const string invalidHash = "%%%"; // not valid base64
             var hash = $"PBKDF2-SHA256:100000:{salt}:{invalidHash}";
 
             // Act

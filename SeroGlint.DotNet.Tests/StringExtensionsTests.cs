@@ -11,8 +11,8 @@ namespace SeroGlint.DotNet.Tests
         public void ContainsIgnoreCase_ShouldReturnTrue_WhenStringContainsValueIgnoringCase()
         {
             // Arrange
-            var baseString = "Hello World";
-            var value = "hello";
+            const string baseString = "Hello World";
+            const string value = "hello";
 
             // Act
             var result = baseString.ContainsIgnoreCase(value);
@@ -25,8 +25,8 @@ namespace SeroGlint.DotNet.Tests
         public void EqualsIgnoreCase_ShouldReturnTrue_WhenStringsAreEqualIgnoringCase()
         {
             // Arrange
-            var baseString = "Hello";
-            var value = "hello";
+            const string baseString = "Hello";
+            const string value = "hello";
 
             // Act
             var result = baseString.EqualsIgnoreCase(value);
@@ -39,8 +39,8 @@ namespace SeroGlint.DotNet.Tests
         public void StartsWithIgnoreCase_ShouldReturnTrue_WhenStringStartsWithValueIgnoringCase()
         {
             // Arrange
-            var baseString = "Hello World";
-            var value = "hello";
+            const string baseString = "Hello World";
+            const string value = "hello";
 
             // Act
             var result = baseString.StartsWithIgnoreCase(value);
@@ -53,8 +53,8 @@ namespace SeroGlint.DotNet.Tests
         public void EndsWithIgnoreCase_ShouldReturnTrue_WhenStringEndsWithValueIgnoringCase()
         {
             // Arrange
-            var baseString = "Hello World";
-            var value = "WORLD";
+            const string baseString = "Hello World";
+            const string value = "WORLD";
 
             // Act
             var result = baseString.EndsWithIgnoreCase(value);
@@ -67,7 +67,7 @@ namespace SeroGlint.DotNet.Tests
         public void ToTitleCase_ShouldConvertStringToTitleCase()
         {
             // Arrange
-            var baseString = "hello world";
+            const string baseString = "hello world";
 
             // Act
             var result = baseString.ToTitleCase();
@@ -80,7 +80,7 @@ namespace SeroGlint.DotNet.Tests
         public void ToInt32_ShouldConvertStringToInt32()
         {
             // Arrange
-            var baseString = "123";
+            const string baseString = "123";
 
             // Act
             var success = baseString.ToInt32(out var result);
@@ -94,7 +94,7 @@ namespace SeroGlint.DotNet.Tests
         public void ToInt64_ShouldConvertStringToInt64()
         {
             // Arrange
-            var baseString = "123456789012345";
+            const string baseString = "123456789012345";
 
             // Act
             var success = baseString.ToInt64(out var result);
@@ -108,7 +108,7 @@ namespace SeroGlint.DotNet.Tests
         public void ToDouble_ShouldConvertStringToDouble()
         {
             // Arrange
-            var baseString = "123.45";
+            const string baseString = "123.45";
 
             // Act
             var success = baseString.ToDouble(out var result);
@@ -122,7 +122,7 @@ namespace SeroGlint.DotNet.Tests
         public void ToDecimal_ShouldConvertStringToDecimal()
         {
             // Arrange
-            var baseString = "123.45";
+            const string baseString = "123.45";
 
             // Act
             var success = baseString.ToDecimal(out var result);
@@ -136,7 +136,7 @@ namespace SeroGlint.DotNet.Tests
         public void ToDateTime_ShouldConvertStringToDateTime()
         {
             // Arrange
-            var baseString = "2025-03-06";
+            const string baseString = "2025-03-06";
 
             // Act
             var success = baseString.ToDateTime(out var result);
@@ -150,7 +150,7 @@ namespace SeroGlint.DotNet.Tests
         public void ToBoolean_ShouldConvertStringToTrueBoolean()
         {
             // Arrange
-            var baseString = "true";
+            const string baseString = "true";
 
             // Act
             var success = baseString.ToBoolean(out var result);
@@ -164,7 +164,7 @@ namespace SeroGlint.DotNet.Tests
         public void ToBoolean_ShouldConvertStringToFalseBoolean()
         {
             // Arrange
-            var baseString = "false";
+            const string baseString = "false";
 
             // Act
             var success = baseString.ToBoolean(out var result);
@@ -178,7 +178,7 @@ namespace SeroGlint.DotNet.Tests
         public void ToBoolean_ShouldConvertStringTo1TrueBoolean()
         {
             // Arrange
-            var baseString = "1";
+            const string baseString = "1";
 
             // Act
             var success = baseString.ToBoolean(out var result);
@@ -192,7 +192,7 @@ namespace SeroGlint.DotNet.Tests
         public void ToBoolean_ShouldConvertStringTo0FalseBoolean()
         {
             // Arrange
-            var baseString = "0";
+            const string baseString = "0";
 
             // Act
             var success = baseString.ToBoolean(out var result);
@@ -206,7 +206,7 @@ namespace SeroGlint.DotNet.Tests
         public void FromJsonToType_ShouldDeserializeJsonStringToObject()
         {
             // Arrange
-            var jsonString = "{\"Id\":1,\"Name\":\"Test\"}";
+            const string jsonString = "{\"Id\":1,\"Name\":\"Test\"}";
             var expectedObject = new SerializationObject { Id = 1, Name = "Test" };
 
             // Act
@@ -222,7 +222,7 @@ namespace SeroGlint.DotNet.Tests
         public void FromJsonToType_ShouldThrowExceptionForInvalidJson()
         {
             // Arrange
-            var invalidJsonString = "{\"Id\":1,\"Name\":\"Test\"";
+            const string invalidJsonString = "{\"Id\":1,\"Name\":\"Test\"";
 
             // Act & Assert
             var exception = Should.Throw<Exception>(() => invalidJsonString.FromJsonToType<SerializationObject>());
@@ -233,7 +233,7 @@ namespace SeroGlint.DotNet.Tests
         public void FromXmlToType_ShouldDeserializeXmlStringToObject()
         {
             // Arrange
-            var xmlString = "<SerializationObject><Id>1</Id><Name>Test</Name></SerializationObject>";
+            const string xmlString = "<SerializationObject><Id>1</Id><Name>Test</Name></SerializationObject>";
             var expectedObject = new SerializationObject { Id = 1, Name = "Test" };
 
             // Act
@@ -249,7 +249,7 @@ namespace SeroGlint.DotNet.Tests
         public void FromXmlToType_ShouldThrowExceptionForInvalidXml()
         {
             // Arrange
-            var invalidXmlString = "<SerializationObject><Id>1<Id><Name>Test</Name></SerializationObject>";
+            const string invalidXmlString = "<SerializationObject><Id>1<Id><Name>Test</Name></SerializationObject>";
 
             // Act & Assert
             var exception = Should.Throw<InvalidOperationException>(() => invalidXmlString.FromXmlToType<SerializationObject>());
@@ -259,7 +259,7 @@ namespace SeroGlint.DotNet.Tests
         [Fact]
         public void IsValidEnumValue_ShouldReturnTrue_WhenValidEnumString()
         {
-            var input = "ValueOne";
+            const string input = "ValueOne";
             var success = input.IsValidEnumValue<SampleEnum>(out var result);
     
             success.ShouldBeTrue();
@@ -269,7 +269,7 @@ namespace SeroGlint.DotNet.Tests
         [Fact]
         public void IsValidEnumValue_ShouldReturnFalse_WhenInvalidEnumString()
         {
-            var input = "Invalid";
+            const string input = "Invalid";
             var success = input.IsValidEnumValue<SampleEnum>(out _);
     
             success.ShouldBeFalse();
@@ -278,7 +278,7 @@ namespace SeroGlint.DotNet.Tests
         [Fact]
         public void GetEnumFromDescription_ShouldReturnEnum_WhenDescriptionMatches()
         {
-            var input = "First Option";
+            const string input = "First Option";
             var result = input.GetEnumFromDescription<SampleEnum>();
 
             result.ShouldBe(SampleEnum.ValueOne);
@@ -287,7 +287,7 @@ namespace SeroGlint.DotNet.Tests
         [Fact]
         public void GetEnumFromDescription_ShouldReturnNull_WhenNoMatch()
         {
-            var input = "Nonexistent";
+            const string input = "Nonexistent";
             var result = input.GetEnumFromDescription<SampleEnum>();
 
             result.ShouldBeNull();
@@ -296,7 +296,7 @@ namespace SeroGlint.DotNet.Tests
         [Fact]
         public void EncodeAsHttp_ShouldUrlEncodeString()
         {
-            var input = "this is a test!";
+            const string input = "this is a test!";
             var result = input.EncodeAsHttp();
 
             result.ShouldBe("this%20is%20a%20test%21");
@@ -305,7 +305,7 @@ namespace SeroGlint.DotNet.Tests
         [Fact]
         public void ToSha256_ShouldReturnExpectedHash()
         {
-            var input = "test";
+            const string input = "test";
             var result = input.ToSha256();
 
             result.ShouldBe("n4bQgYhMfWWaL+qgxVrQFaO/TxsrC4Is0V1sFbDwCgg=");
@@ -314,7 +314,7 @@ namespace SeroGlint.DotNet.Tests
         [Fact]
         public void ToHexString_ShouldConvertStringToHex()
         {
-            var input = "abc";
+            const string input = "abc";
             var result = input.ToHexString();
 
             result.ShouldBe("616263");
@@ -323,7 +323,7 @@ namespace SeroGlint.DotNet.Tests
         [Fact]
         public void ToHexString_ShouldRespectEncodingParameter()
         {
-            var input = "abc";
+            const string input = "abc";
             var result = input.ToHexString(Encoding.ASCII);
 
             result.ShouldBe("616263");

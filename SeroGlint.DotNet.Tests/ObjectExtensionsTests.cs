@@ -11,7 +11,7 @@ namespace SeroGlint.DotNet.Tests
         {
             // Arrange
             var testObject = new SerializationObject { Id = 1, Name = "Test" };
-            var expectedJsonString = "{\"Id\":1,\"Name\":\"Test\"}";
+            const string expectedJsonString = "{\"Id\":1,\"Name\":\"Test\"}";
 
             // Act
             var result = testObject.ToJson();
@@ -35,10 +35,10 @@ namespace SeroGlint.DotNet.Tests
             // Arrange
             var testObject = new SerializationObject { Id = 1, Name = "Test" };
 
-            var expectedXml = "<?xml version=\"1.0\" encoding=\"utf-16\"?>" +
-                              "<SerializationObject xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
-                              "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">" +
-                              "<Id>1</Id><Name>Test</Name></SerializationObject>";
+            const string expectedXml = "<?xml version=\"1.0\" encoding=\"utf-16\"?>" +
+                                       "<SerializationObject xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
+                                       "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">" +
+                                       "<Id>1</Id><Name>Test</Name></SerializationObject>";
 
             // Act
             var result = testObject.ToXml();

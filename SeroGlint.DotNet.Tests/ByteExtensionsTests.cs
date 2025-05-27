@@ -1,8 +1,6 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
 using SeroGlint.DotNet.Extensions;
 using Shouldly;
-using Xunit;
 
 namespace SeroGlint.DotNet.Tests
 {
@@ -79,12 +77,12 @@ namespace SeroGlint.DotNet.Tests
         public void ToHexString_ShouldThrowArgumentNullException_WhenNullInput()
         {
             // Arrange
-            byte[] input = null;
+            byte[]? input = null;
 
             // Act & Assert
             Should.Throw<ArgumentNullException>(() =>
             {
-                var _ = input.ToHexString();
+                _ = input.ToHexString();
             });
         }
     }

@@ -9,9 +9,9 @@ namespace SeroGlint.DotNet.Tests
         public void IsBetween_ShouldReturnTrue_WhenValueIsBetweenMinAndMax()
         {
             // Arrange
-            int value = 5;
-            int minValue = 1;
-            int maxValue = 10;
+            const int value = 5;
+            const int minValue = 1;
+            const int maxValue = 10;
 
             // Act
             var result = value.IsBetween(minValue, maxValue);
@@ -24,8 +24,8 @@ namespace SeroGlint.DotNet.Tests
         public void IsMultipleOf_ShouldReturnTrue_WhenValueIsMultipleOfGivenNumber()
         {
             // Arrange
-            int value = 10;
-            int multiple = 2;
+            const int value = 10;
+            const int multiple = 2;
 
             // Act
             var result = value.IsMultipleOf(multiple);

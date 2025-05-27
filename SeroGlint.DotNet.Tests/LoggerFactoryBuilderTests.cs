@@ -1,39 +1,36 @@
-﻿using SeroGlint.DotNet.Logging;
-using SeroGlint.DotNet.Tests.Interfaces;
-using SeroGlint.DotNet.Tests.Utilities;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NLog;
 using NSubstitute;
 using SeroGlint.DotNet.Abstractions;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
-using Serilog;
+using SeroGlint.DotNet.Logging;
+using SeroGlint.DotNet.Tests.Utilities;
 
 namespace SeroGlint.DotNet.Tests
 {
     public class LoggerFactoryBuilderTests : IDisposable
     {
-        private readonly ILogFileCleaner _cleaner = new LogFileCleaner();
-        private readonly string _testLogPath = @".\tmp\log_test_tagsw40k";
+        private readonly LogFileCleaner _cleaner = new();
+        private const string TestLogPath = @".\tmp\log_test_tagsw40k";
 
         public LoggerFactoryBuilderTests()
         {
-            if (!Directory.Exists(_testLogPath))
+            if (!Directory.Exists(TestLogPath))
             {
-                Directory.CreateDirectory(_testLogPath);
+                Directory.CreateDirectory(TestLogPath);
             }
         }
 
-        public void Dispose()
+        void IDisposable.Dispose()
         {
             Thread.Sleep(100);
             _cleaner.TryDelete(FindFile());
         }
 
-        private string FindFile()
+        private static string FindFile()
         {
             return Directory
-                .GetFiles(_testLogPath, "TestLog*.log")
+                .GetFiles(TestLogPath, "TestLog*.log")
                 .FirstOrDefault() ?? string.Empty;
         }
 
@@ -42,7 +39,7 @@ namespace SeroGlint.DotNet.Tests
         {
             var builder = new LoggerFactoryBuilder()
                 .EnableConsoleOutput()
-                .EnableFileOutput(createLogPath: true, logPath: _testLogPath, logName: "TestLog", logExtension: "log")
+                .EnableFileOutput(createLogPath: true, logPath: TestLogPath, logName: "TestLog", logExtension: "log")
                 .SetMinimumLevel(LoggingLevel.Information)
                 .SetRollingInterval(LogRollInterval.Monthly)
                 .SetFileSizeLimit(5 * 1024 * 1024)
@@ -55,7 +52,6 @@ namespace SeroGlint.DotNet.Tests
             Assert.NotNull(logger);
             logger.LogInformation("This is a test log message.");
 
-            // Force Serilog to flush and delay to ensure file is written
             Serilog.Log.CloseAndFlush();
             Thread.Sleep(100);
 
@@ -70,7 +66,7 @@ namespace SeroGlint.DotNet.Tests
             // Arrange
             var builder = new LoggerFactoryBuilder()
                 .EnableConsoleOutput()
-                .EnableFileOutput(createLogPath: true, logPath: _testLogPath, logName: "TestLog", logExtension: "log")
+                .EnableFileOutput(createLogPath: true, logPath: TestLogPath, logName: "TestLog", logExtension: "log")
                 .SetMinimumLevel(LoggingLevel.Information)
                 .SetRollingInterval(LogRollInterval.Monthly)
                 .SetFileSizeLimit(5 * 1024 * 1024)
@@ -82,8 +78,6 @@ namespace SeroGlint.DotNet.Tests
             var logger = builder.BuildNLog();
             Assert.NotNull(logger);
             logger.LogInformation("This is a test log message from NLog.");
-
-            // Let NLog flush and release handles
             LogManager.Flush();
             Thread.Sleep(100);
 
@@ -103,7 +97,7 @@ namespace SeroGlint.DotNet.Tests
 
             var builder = new LoggerFactoryBuilder()
                 .EnableConsoleOutput()
-                .EnableFileOutput(createLogPath: true, logPath: _testLogPath, logName: "TestLog", logExtension: "log")
+                .EnableFileOutput(createLogPath: true, logPath: TestLogPath, logName: "TestLog", logExtension: "log")
                 .SetConfiguration(configuration);
 
             var logger = builder.BuildSerilog();
@@ -141,7 +135,7 @@ namespace SeroGlint.DotNet.Tests
             var mockManager = Substitute.For<IDirectoryManagement>();
             var loggerBuilder = new LoggerFactoryBuilder(mockManager)
                 .EnableConsoleOutput()
-                .EnableFileOutput(createLogPath: true, logPath: _testLogPath, logName: "TestLog", logExtension: "log");
+                .EnableFileOutput(createLogPath: true, logPath: TestLogPath, logName: "TestLog", logExtension: "log");
 
             var actual = loggerBuilder.FileManager;
 

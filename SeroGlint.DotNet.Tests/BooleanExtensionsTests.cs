@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SeroGlint.DotNet.Extensions;
+﻿using SeroGlint.DotNet.Extensions;
 using Shouldly;
 
 namespace SeroGlint.DotNet.Tests
@@ -14,7 +9,7 @@ namespace SeroGlint.DotNet.Tests
         public void ToInteger_ShouldReturnOneForTrue()
         {
             // Arrange
-            bool boolean = true;
+            const bool boolean = true;
 
             // Act
             var result = boolean.ToInteger();
@@ -27,7 +22,7 @@ namespace SeroGlint.DotNet.Tests
         public void ToInteger_ShouldReturnZeroForFalse()
         {
             // Arrange
-            bool boolean = false;
+            const bool boolean = false;
 
             // Act
             var result = boolean.ToInteger();
@@ -40,7 +35,7 @@ namespace SeroGlint.DotNet.Tests
         public void ToYesNo_ShouldReturnYesForTrue()
         {
             // Arrange
-            bool boolean = true;
+            const bool boolean = true;
 
             // Act
             var result = boolean.ToYesNo();
@@ -53,7 +48,7 @@ namespace SeroGlint.DotNet.Tests
         public void ToYesNo_ShouldReturnNoForFalse()
         {
             // Arrange
-            bool boolean = false;
+            const bool boolean = false;
 
             // Act
             var result = boolean.ToYesNo();
@@ -66,7 +61,7 @@ namespace SeroGlint.DotNet.Tests
         public void ToOneZero_ShouldReturnOneForTrue()
         {
             // Arrange
-            bool boolean = true;
+            const bool boolean = true;
 
             // Act
             var result = boolean.ToOneZero();
@@ -79,7 +74,7 @@ namespace SeroGlint.DotNet.Tests
         public void ToOneZero_ShouldReturnZeroForFalse()
         {
             // Arrange
-            bool boolean = false;
+            const bool boolean = false;
 
             // Act
             var result = boolean.ToOneZero();
@@ -92,7 +87,7 @@ namespace SeroGlint.DotNet.Tests
         public void ToOnOff_ShouldReturnOnForTrue()
         {
             // Arrange
-            bool boolean = true;
+            const bool boolean = true;
 
             // Act
             var result = boolean.ToOnOff();
@@ -105,7 +100,7 @@ namespace SeroGlint.DotNet.Tests
         public void ToOnOff_ShouldReturnOffForFalse()
         {
             // Arrange
-            bool boolean = false;
+            const bool boolean = false;
 
             // Act
             var result = boolean.ToOnOff();
@@ -118,7 +113,7 @@ namespace SeroGlint.DotNet.Tests
         public void ToEnabledDisabled_ShouldReturnEnabledForTrue()
         {
             // Arrange
-            bool boolean = true;
+            const bool boolean = true;
 
             // Act
             var result = boolean.ToEnabledDisabled();
@@ -131,7 +126,7 @@ namespace SeroGlint.DotNet.Tests
         public void ToEnabledDisabled_ShouldReturnDisabledForFalse()
         {
             // Arrange
-            bool boolean = false;
+            const bool boolean = false;
 
             // Act
             var result = boolean.ToEnabledDisabled();
@@ -144,7 +139,7 @@ namespace SeroGlint.DotNet.Tests
         public void ToActiveInactive_ShouldReturnActiveForTrue()
         {
             // Arrange
-            bool boolean = true;
+            const bool boolean = true;
 
             // Act
             var result = boolean.ToActiveInactive();
@@ -157,7 +152,7 @@ namespace SeroGlint.DotNet.Tests
         public void ToActiveInactive_ShouldReturnInactiveForFalse()
         {
             // Arrange
-            bool boolean = false;
+            const bool boolean = false;
 
             // Act
             var result = boolean.ToActiveInactive();

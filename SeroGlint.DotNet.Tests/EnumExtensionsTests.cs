@@ -1,13 +1,10 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using SeroGlint.DotNet.Extensions;
 using NLog;
 using NLog.Targets;
-using Serilog.Events;
 using Serilog;
+using Serilog.Events;
+using SeroGlint.DotNet.Extensions;
 using Shouldly;
-using Xunit;
 
 namespace SeroGlint.DotNet.Tests
 {
@@ -28,7 +25,7 @@ namespace SeroGlint.DotNet.Tests
         public void GetDescription_ShouldReturnDescriptionAttribute_WhenPresent()
         {
             // Arrange
-            var value = TestEnum.First;
+            const TestEnum value = TestEnum.First;
 
             // Act
             var description = value.GetDescription();
@@ -41,7 +38,7 @@ namespace SeroGlint.DotNet.Tests
         public void GetDescription_ShouldFallbackToEnumName_WhenNoDescriptionAttribute()
         {
             // Arrange
-            var value = TestEnum.Third;
+            const TestEnum value = TestEnum.Third;
 
             // Act
             var description = value.GetDescription();
@@ -54,10 +51,10 @@ namespace SeroGlint.DotNet.Tests
         public void GetAllValues_ShouldReturnAllEnumValues()
         {
             // Arrange
-            var dummy = TestEnum.First;
+            const TestEnum value = TestEnum.First;
 
             // Act
-            var values = dummy.GetAllValues();
+            var values = value.GetAllValues();
 
             // Assert
             values.ShouldBe([TestEnum.First, TestEnum.Second, TestEnum.Third]);
@@ -79,7 +76,7 @@ namespace SeroGlint.DotNet.Tests
         [Fact]
         public void ToSerilogLevel_InvalidInput_Throws()
         {
-            var invalid = (LoggingLevel)(-999);
+            const LoggingLevel invalid = (LoggingLevel)(-999);
             Assert.Throws<ArgumentOutOfRangeException>(() => invalid.ToSerilogLevel());
         }
 
