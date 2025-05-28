@@ -4,7 +4,7 @@ using SeroGlint.DotNet.Extensions;
 using Shouldly;
 using Xunit;
 
-namespace SeroGlint.DotNet.Tests
+namespace SeroGlint.DotNet.Tests.TestClasses.Extensions
 {
     public class ByteExtensionsTests
     {

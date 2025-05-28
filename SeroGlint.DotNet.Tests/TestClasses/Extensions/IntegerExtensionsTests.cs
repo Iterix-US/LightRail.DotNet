@@ -1,7 +1,7 @@
 ﻿using SeroGlint.DotNet.Extensions;
 using Shouldly;
 
-namespace SeroGlint.DotNet.Tests
+namespace SeroGlint.DotNet.Tests.TestClasses.Extensions
 {
     public class IntegerExtensionsTests
     {
@@ -9,9 +9,9 @@ namespace SeroGlint.DotNet.Tests
         public void IsBetween_ShouldReturnTrue_WhenValueIsBetweenMinAndMax()
         {
             // Arrange
-            int value = 5;
-            int minValue = 1;
-            int maxValue = 10;
+            var value = 5;
+            var minValue = 1;
+            var maxValue = 10;
 
             // Act
             var result = value.IsBetween(minValue, maxValue);
@@ -24,8 +24,8 @@ namespace SeroGlint.DotNet.Tests
         public void IsMultipleOf_ShouldReturnTrue_WhenValueIsMultipleOfGivenNumber()
         {
             // Arrange
-            int value = 10;
-            int multiple = 2;
+            var value = 10;
+            var multiple = 2;
 
             // Act
             var result = value.IsMultipleOf(multiple);

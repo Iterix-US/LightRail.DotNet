@@ -2,7 +2,7 @@
 using SeroGlint.DotNet.Tests.TestObjects;
 using Shouldly;
 
-namespace SeroGlint.DotNet.Tests
+namespace SeroGlint.DotNet.Tests.TestClasses.Extensions
 {
     public class ObjectExtensionsTests
     {

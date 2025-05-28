@@ -3,7 +3,7 @@ using SeroGlint.DotNet.Extensions;
 using SeroGlint.DotNet.Tests.TestObjects;
 using Shouldly;
 
-namespace SeroGlint.DotNet.Tests
+namespace SeroGlint.DotNet.Tests.TestClasses.Extensions
 {
     public class StringExtensionsTests
     {
@@ -255,13 +255,13 @@ namespace SeroGlint.DotNet.Tests
             var exception = Should.Throw<InvalidOperationException>(() => invalidXmlString.FromXmlToType<SerializationObject>());
             exception.Message.ShouldContain($"Error deserializing XML to {typeof(SerializationObject)}.");
         }
-        
+
         [Fact]
         public void IsValidEnumValue_ShouldReturnTrue_WhenValidEnumString()
         {
             var input = "ValueOne";
             var success = input.IsValidEnumValue<SampleEnum>(out var result);
-    
+
             success.ShouldBeTrue();
             result.ShouldBe(SampleEnum.ValueOne);
         }
@@ -271,7 +271,7 @@ namespace SeroGlint.DotNet.Tests
         {
             var input = "Invalid";
             var success = input.IsValidEnumValue<SampleEnum>(out _);
-    
+
             success.ShouldBeFalse();
         }
 

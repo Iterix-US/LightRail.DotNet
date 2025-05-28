@@ -5,18 +5,19 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SeroGlint.DotNet.Extensions;
 using SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces;
+using SeroGlint.DotNet.NamedPipes.Packaging;
 
 namespace SeroGlint.DotNet.NamedPipes
 {
     public class NamedPipeClient : INamedPipeClient
     {
         private readonly ILogger _logger;
-        private readonly IPipeMessageFormatter _formatter;
+        private readonly INamedPipeConfigurator _configuration;
 
-        public NamedPipeClient(IPipeMessageFormatter formatter, ILogger logger)
+        public NamedPipeClient(INamedPipeConfigurator configuration, ILogger logger)
         {
             _logger = logger;
-            _formatter = formatter;
+            _configuration = configuration;
         }
 
         public async Task SendMessage(string serverName, string pipeName, string messageContent, bool encryptMessage)
@@ -27,7 +28,7 @@ namespace SeroGlint.DotNet.NamedPipes
             }
 
             _logger.LogInformation("Encrypting message before sending.");
-            await SendToPipeAsync(serverName, pipeName, messageContent, encryptMessage);
+            await SendToPipeAsync(messageContent, _configuration);
         }
 
         private bool ValidateMessageSettings(string serverName, string pipeName, string messageContent)
@@ -62,18 +63,29 @@ namespace SeroGlint.DotNet.NamedPipes
             throw new ArgumentException(errors);
         }
 
-        private async Task SendToPipeAsync(string serverName, string pipeName, string messageContent, bool encrypt = true)
+        private async Task SendToPipeAsync<TTargetType>(TTargetType message, INamedPipeConfigurator configuration)
         {
-            var message = 
-                encrypt ?
-                _formatter.Serialize(messageContent) :
-                Encoding.UTF8.GetBytes(messageContent);
+            var envelope = new PipeEnvelope<TTargetType>
+            {
+                Payload = message
+            };
 
-            using (var client =
-                   new NamedPipeClientStream(serverName, pipeName, PipeDirection.InOut, PipeOptions.Asynchronous))
+            var serializedEnvelope = envelope.Serialize();
+            if (configuration.UseEncryption)
+            {
+                _logger.LogInformation("Encrypting message before sending.");
+                serializedEnvelope = configuration.EncryptionService.Encrypt(serializedEnvelope);
+            }
+
+            using (var client = new NamedPipeClientStream(
+                       configuration.ServerName, 
+                       configuration.PipeName, 
+                       PipeDirection.InOut,
+                       PipeOptions.Asynchronous))
             {
                 await client.ConnectAsync();
-                await client.WriteAsync(message, 0, message.Length);
+                await client.WriteAsync(serializedEnvelope, 0, serializedEnvelope.Length);
+                await client.FlushAsync();
             }
         }
     }

@@ -2,6 +2,8 @@
 using SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces;
 using System.Threading.Tasks;
 using NLog;
+using SeroGlint.DotNet.NamedPipes.Delegates;
+using SeroGlint.DotNet.NamedPipes.Packaging;
 
 namespace SeroGlint.DotNet.NamedPipes.Servers
 {
@@ -11,37 +13,40 @@ namespace SeroGlint.DotNet.NamedPipes.Servers
     public class MomentaryPipeServer : INamedPipeServer
     {
         private readonly ILogger _logger;
-        private readonly INamedPipeServer _inner;
+        private readonly INamedPipeServerCore _core;
+        public CancellationTokenSource CancellationTokenSource { get; } = new CancellationTokenSource();
+
         private bool _hasReceivedMessage;
 
         public event PipeMessageReceivedHandler MessageReceived
         {
-            add => _inner.MessageReceived += value;
-            remove => _inner.MessageReceived -= value;
+            add => _core.MessageReceived += value;
+            remove => _core.MessageReceived -= value;
         }
 
-        public MomentaryPipeServer(INamedPipeServer core, ILogger logger)
+        public MomentaryPipeServer(INamedPipeServerCore core, ILogger logger)
         {
             _logger = logger;
-            _inner = core;
-            _inner.MessageReceived += OnMessageReceived;
+            _core = core;
+            _core.MessageReceived += OnMessageReceived;
         }
 
         private void OnMessageReceived(object sender, PipeMessageReceivedEventArgs e)
         {
-            if (_hasReceivedMessage)
-            {
-                _logger.Warn("MomentaryPipeServer has already received a message. Ignoring subsequent messages.");
-                return;
-            }
+            if (_hasReceivedMessage) return;
 
-            _logger.Info("MomentaryPipeServer received a message");
             _hasReceivedMessage = true;
-            _inner.Dispose();
+            _logger.Info("MomentaryPipeServer received first message. Cancelling server...");
+            CancellationTokenSource.Cancel();
         }
 
-        public Task StartAsync(string pipeName, CancellationToken cancellationToken) => _inner.StartAsync(pipeName, cancellationToken);
+        public Task StartAsync() => _core.StartAsync();
 
-        public void Dispose() => _inner.Dispose();
+        public void Dispose()
+        {
+            CancellationTokenSource.Cancel();
+            CancellationTokenSource.Dispose();
+            _core.Dispose();
+        }
     }
 }

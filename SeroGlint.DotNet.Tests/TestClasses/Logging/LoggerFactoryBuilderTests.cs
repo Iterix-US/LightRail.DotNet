@@ -9,7 +9,7 @@ using SeroGlint.DotNet.Abstractions;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 using Serilog;
 
-namespace SeroGlint.DotNet.Tests
+namespace SeroGlint.DotNet.Tests.TestClasses.Logging
 {
     public class LoggerFactoryBuilderTests : IDisposable
     {
@@ -56,7 +56,7 @@ namespace SeroGlint.DotNet.Tests
             logger.LogInformation("This is a test log message.");
 
             // Force Serilog to flush and delay to ensure file is written
-            Serilog.Log.CloseAndFlush();
+            Log.CloseAndFlush();
             Thread.Sleep(100);
 
             Assert.True(File.Exists(FindFile()), "Expected log file was not created.");

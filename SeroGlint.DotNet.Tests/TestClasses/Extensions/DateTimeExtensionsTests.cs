@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using SeroGlint.DotNet.Extensions;
 using Shouldly;
 
-namespace SeroGlint.DotNet.Tests
+namespace SeroGlint.DotNet.Tests.TestClasses.Extensions
 {
     [ExcludeFromCodeCoverage]
     public class DateTimeExtensionsTests
@@ -107,7 +107,7 @@ namespace SeroGlint.DotNet.Tests
             var baseDate = new DateTime(10, 1, 1);
 
             // Act & Assert
-            
+
             Should.Throw<ArgumentOutOfRangeException>(() =>
             {
                 var _ = baseDate.Minus(years: 20);

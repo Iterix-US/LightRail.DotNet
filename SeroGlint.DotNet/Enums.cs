@@ -74,4 +74,21 @@ namespace SeroGlint.DotNet
         Perpetual
     }
 
+    public enum Error
+    {
+        [Description("No Error")]
+        None = 0,
+        [Description("Invalid Argument")]
+        InvalidArgument = 100,
+        [Description("Not Found")]
+        NotFound = 101,
+        [Description("Access Denied")]
+        AccessDenied = 102,
+        [Description("Timeout")]
+        Timeout = 103,
+        [Description("Unknown Error")]
+        UnknownError = 104,
+        [Description("Operation Failed")]
+        OperationFailed = 105,
+    }
 }

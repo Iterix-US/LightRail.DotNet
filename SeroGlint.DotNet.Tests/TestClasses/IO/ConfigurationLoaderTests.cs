@@ -6,7 +6,7 @@ using SeroGlint.DotNet.Tests.TestObjects;
 using NSubstitute;
 using Shouldly;
 
-namespace SeroGlint.DotNet.Tests
+namespace SeroGlint.DotNet.Tests.TestClasses.IO
 {
     public class ConfigurationLoaderTests
     {

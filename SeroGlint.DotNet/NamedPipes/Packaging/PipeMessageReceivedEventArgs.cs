@@ -1,15 +1,15 @@
 ﻿using System;
 
-namespace SeroGlint.DotNet.NamedPipes
+namespace SeroGlint.DotNet.NamedPipes.Packaging
 {
     public class PipeMessageReceivedEventArgs : EventArgs
     {
-        public string RawJson { get; }
+        public string Json { get; }
         public object DeserializedMessage { get; }
 
-        public PipeMessageReceivedEventArgs(string rawJson, object deserializedMessage)
+        public PipeMessageReceivedEventArgs(string json, object deserializedMessage)
         {
-            RawJson = rawJson;
+            Json = json;
             DeserializedMessage = deserializedMessage;
         }
     }

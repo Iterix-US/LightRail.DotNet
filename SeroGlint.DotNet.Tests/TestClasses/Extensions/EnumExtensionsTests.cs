@@ -9,7 +9,7 @@ using Serilog;
 using Shouldly;
 using Xunit;
 
-namespace SeroGlint.DotNet.Tests
+namespace SeroGlint.DotNet.Tests.TestClasses.Extensions
 {
     public class EnumExtensionsTests
     {

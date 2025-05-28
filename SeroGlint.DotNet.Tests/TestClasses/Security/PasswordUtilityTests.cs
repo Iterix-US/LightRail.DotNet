@@ -4,7 +4,7 @@ using SeroGlint.DotNet.SecurityUtilities;
 using Shouldly;
 using Xunit;
 
-namespace SeroGlint.DotNet.Tests
+namespace SeroGlint.DotNet.Tests.TestClasses.Security
 {
     public class PasswordUtilityTests
     {
@@ -143,7 +143,7 @@ namespace SeroGlint.DotNet.Tests
 
             h1.ShouldBe(h2);
         }
-        
+
         [Fact]
         public void VerifyPassword_ShouldReturnFalse_WhenSaltIsInvalidBase64()
         {
