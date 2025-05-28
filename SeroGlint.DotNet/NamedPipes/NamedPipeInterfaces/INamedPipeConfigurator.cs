@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Threading;
+using Microsoft.Extensions.Logging;
 using SeroGlint.DotNet.SecurityUtilities.SecurityInterfaces;
-using System.Threading;
 
 namespace SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces
 {

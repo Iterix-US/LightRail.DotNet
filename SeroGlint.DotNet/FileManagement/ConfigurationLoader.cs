@@ -2,8 +2,8 @@
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text.Json;
-using SeroGlint.DotNet.Abstractions;
 using Microsoft.Extensions.Logging;
+using SeroGlint.DotNet.Abstractions;
 
 namespace SeroGlint.DotNet.FileManagement
 {

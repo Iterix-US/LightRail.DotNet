@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using SeroGlint.DotNet.Extensions;
 using NLog;
 using NLog.Targets;
-using Serilog.Events;
 using Serilog;
+using Serilog.Events;
+using SeroGlint.DotNet.Extensions;
 using Shouldly;
 using Xunit;
 

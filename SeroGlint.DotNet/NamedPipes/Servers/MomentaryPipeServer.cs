@@ -1,8 +1,8 @@
 ﻿using System.Threading;
-using SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces;
 using System.Threading.Tasks;
 using NLog;
 using SeroGlint.DotNet.NamedPipes.Delegates;
+using SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces;
 using SeroGlint.DotNet.NamedPipes.Packaging;
 
 namespace SeroGlint.DotNet.NamedPipes.Servers

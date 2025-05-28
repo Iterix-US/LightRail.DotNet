@@ -1,13 +1,13 @@
-﻿using SeroGlint.DotNet.Logging;
-using SeroGlint.DotNet.Tests.Interfaces;
-using SeroGlint.DotNet.Tests.Utilities;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NLog;
 using NSubstitute;
-using SeroGlint.DotNet.Abstractions;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 using Serilog;
+using SeroGlint.DotNet.Abstractions;
+using SeroGlint.DotNet.Logging;
+using SeroGlint.DotNet.Tests.Interfaces;
+using SeroGlint.DotNet.Tests.Utilities;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace SeroGlint.DotNet.Tests.TestClasses.Logging
 {

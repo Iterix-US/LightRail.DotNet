@@ -1,6 +1,6 @@
-﻿using SeroGlint.DotNet.NamedPipes.Delegates;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using SeroGlint.DotNet.NamedPipes.Delegates;
 
 namespace SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces
 {

@@ -1,10 +1,11 @@
-﻿using SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces;
-using System;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO.Pipes;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SeroGlint.DotNet.NamedPipes.Delegates;
+using SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces;
 using SeroGlint.DotNet.NamedPipes.Packaging;
 
 namespace SeroGlint.DotNet.NamedPipes.Servers
@@ -23,14 +24,30 @@ namespace SeroGlint.DotNet.NamedPipes.Servers
 
         public async Task StartAsync()
         {
-            using (var server = new NamedPipeServerStream(
-                       Configuration.PipeName,
-                       PipeDirection.InOut,
-                       1,
-                       PipeTransmissionMode.Message,
-                       PipeOptions.Asynchronous))
+            try
             {
-                await HandlePipeStream(server);
+                using (var server = new NamedPipeServerStream(
+                           Configuration.PipeName,
+                           PipeDirection.InOut,
+                           1,
+                           PipeTransmissionMode.Message,
+                           PipeOptions.Asynchronous))
+                {
+                    await HandlePipeStream(server);
+                }
+            }
+            catch (OperationCanceledException ex)
+            {
+                Configuration.Logger.LogInformation("Operation cancelled on pipe '{PipeName}'", Configuration.PipeName);
+                throw new OperationCanceledException("Pipe operation was cancelled.", ex);
+            }
+            catch (Exception ex)
+            {
+                Configuration.Logger.LogError(ex, "Error occurred while starting named pipe server");
+                ResponseRequested?.Invoke(this, new PipeResponseRequestedEventArgs(
+                    Guid.Empty,
+                    $"Error starting pipe server: {ex.Message}",
+                    null));
             }
         }
 
@@ -55,7 +72,7 @@ namespace SeroGlint.DotNet.NamedPipes.Servers
                     HandleMessage<dynamic>(bytesRead, buffer, server);
                 }
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
                 Configuration.Logger.LogInformation("Operation cancelled on pipe '{PipeName}'", Configuration.PipeName);
             }
@@ -98,6 +115,7 @@ namespace SeroGlint.DotNet.NamedPipes.Servers
             }
         }
 
+        [ExcludeFromCodeCoverage]
         public void Dispose() => 
             Configuration.Logger.LogInformation($"Server disposed [{Configuration.ServerName} -> {Configuration.PipeName}]");
     }

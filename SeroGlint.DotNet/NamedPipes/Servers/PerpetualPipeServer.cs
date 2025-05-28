@@ -1,9 +1,9 @@
-﻿using SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SeroGlint.DotNet.NamedPipes.Delegates;
+using SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces;
 
 namespace SeroGlint.DotNet.NamedPipes.Servers
 {

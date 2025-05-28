@@ -1,7 +1,7 @@
 ﻿using System;
-using SeroGlint.DotNet.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SeroGlint.DotNet.Abstractions;
 
 namespace SeroGlint.DotNet.Logging.LoggerInterfaces
 {

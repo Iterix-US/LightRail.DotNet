@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces;
@@ -30,7 +31,7 @@ namespace SeroGlint.DotNet.NamedPipes.Packaging
 
         public void SetPipeName(string pipeName)
         {
-            if (string.IsNullOrWhiteSpace(pipeName))
+            if (!Debugger.IsAttached && string.IsNullOrWhiteSpace(pipeName))
             {
                 Logger.LogWarning("Pipe name cannot be null or whitespace.");
             }

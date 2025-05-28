@@ -1,8 +1,8 @@
-﻿using SeroGlint.DotNet.Extensions;
-using SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces;
-using System;
+﻿using System;
 using System.Text;
 using Microsoft.Extensions.Logging;
+using SeroGlint.DotNet.Extensions;
+using SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces;
 
 namespace SeroGlint.DotNet.NamedPipes.Packaging
 {
