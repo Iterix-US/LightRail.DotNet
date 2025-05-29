@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using NLog;
 using NLog.Targets;
@@ -7,7 +5,6 @@ using Serilog;
 using Serilog.Events;
 using SeroGlint.DotNet.Extensions;
 using Shouldly;
-using Xunit;
 
 namespace SeroGlint.DotNet.Tests.TestClasses.Extensions
 {

@@ -7,7 +7,6 @@ using SeroGlint.DotNet.Abstractions;
 using SeroGlint.DotNet.Logging;
 using SeroGlint.DotNet.Tests.Interfaces;
 using SeroGlint.DotNet.Tests.Utilities;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace SeroGlint.DotNet.Tests.TestClasses.Logging
 {

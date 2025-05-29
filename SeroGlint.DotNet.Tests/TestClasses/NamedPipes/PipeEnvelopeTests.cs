@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using SeroGlint.DotNet.Extensions;
 using SeroGlint.DotNet.NamedPipes.Packaging;
-using SeroGlint.DotNet.SecurityUtilities;
 using SeroGlint.DotNet.Tests.TestObjects;
 
 namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes

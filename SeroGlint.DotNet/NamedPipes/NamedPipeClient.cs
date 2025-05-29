@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO.Pipes;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SeroGlint.DotNet.Extensions;
@@ -14,12 +15,15 @@ namespace SeroGlint.DotNet.NamedPipes
     public class NamedPipeClient : INamedPipeClient
     {
         private readonly ILogger _logger;
-        private readonly INamedPipeConfigurator _configuration;
+        private readonly IPipeClientStreamWrapper _pipeClientStreamWrapper;
 
-        public NamedPipeClient(INamedPipeConfigurator configuration, ILogger logger)
+        internal INamedPipeConfigurator Configuration { get; private set; }
+
+        public NamedPipeClient(INamedPipeConfigurator configuration, ILogger logger, IPipeClientStreamWrapper pipeClientStreamWrapper = null)
         {
             _logger = logger;
-            _configuration = configuration;
+            Configuration = configuration;
+            _pipeClientStreamWrapper = pipeClientStreamWrapper;
         }
 
         /// <summary>
@@ -28,18 +32,18 @@ namespace SeroGlint.DotNet.NamedPipes
         /// <typeparam name="T"></typeparam>
         /// <param name="message"></param>
         /// <returns></returns>
-        public async Task SendMessage<T>(IPipeEnvelope<T> message)
+        public virtual async Task SendMessage<T>(IPipeEnvelope<T> message)
         {
-            if (!ValidateMessageSettings(_configuration.ServerName, _configuration.PipeName, message))
+            if (!ValidateMessageSettings(Configuration.ServerName, Configuration.PipeName, message))
             {
                 return;
             }
 
             _logger.LogInformation("Encrypting message before sending.");
-            await SendToPipeAsync(message, _configuration);
+            await SendToPipeAsync(message, Configuration);
         }
 
-        private bool ValidateMessageSettings<T>(string serverName, string pipeName, IPipeEnvelope<T> messageContent)
+        internal bool ValidateMessageSettings<T>(string serverName, string pipeName, IPipeEnvelope<T> messageContent)
         {
             var stringBuilder = new StringBuilder();
 
@@ -55,7 +59,7 @@ namespace SeroGlint.DotNet.NamedPipes
                 stringBuilder.AppendLine(errorMessage);
             }
 
-            if (string.IsNullOrWhiteSpace(messageContent.Payload.ToJson()))
+            if (messageContent == null || messageContent.Payload == null || string.IsNullOrWhiteSpace(messageContent.Payload.ToJson()))
             {
                 const string errorMessage = "Message content cannot be null or whitespace.";
                 stringBuilder.AppendLine(errorMessage);
@@ -68,10 +72,10 @@ namespace SeroGlint.DotNet.NamedPipes
             }
 
             _logger.LogError("Validation failed: {Errors}", errors);
-            throw new ArgumentException(errors);
+            return false;
         }
 
-        private async Task SendToPipeAsync<T>(IPipeEnvelope<T> message, INamedPipeConfigurator configuration)
+        internal async Task SendToPipeAsync<T>(IPipeEnvelope<T> message, INamedPipeConfigurator configuration)
         {
             var serializedEnvelope = message.Serialize();
             if (configuration.UseEncryption)
@@ -80,33 +84,51 @@ namespace SeroGlint.DotNet.NamedPipes
                 serializedEnvelope = configuration.EncryptionService.Encrypt(serializedEnvelope);
             }
 
-            using (var client = new NamedPipeClientStream(
-                       configuration.ServerName, 
-                       configuration.PipeName, 
-                       PipeDirection.InOut,
-                       PipeOptions.Asynchronous))
+            IPipeClientStreamWrapper client;
+            if (_pipeClientStreamWrapper != null)
+            {
+                client = _pipeClientStreamWrapper;
+            }
+            else
+            {
+                var clientStream = new NamedPipeClientStream(
+                        configuration.ServerName,
+                        configuration.PipeName,
+                        PipeDirection.InOut,
+                        PipeOptions.Asynchronous);
+
+                client = new PipeClientStreamWrapper(clientStream);
+                _logger.LogInformation("Instantiating new client base.");
+            }
+            _logger.LogInformation($"Using pipe client with Id {client.Id}");
+
+            using (client)
             {
                 await SendWithTimeout(client, serializedEnvelope);
             }
         }
 
-        private async Task SendWithTimeout(NamedPipeClientStream client, byte[] serializedEnvelope)
+        private async Task SendWithTimeout(IPipeClientStreamWrapper client, byte[] serializedEnvelope)
         {
-            var token = _configuration.CancellationTokenSource.Token;
+            var token = Configuration.CancellationTokenSource.Token;
+            await SendWithTimeoutInternal(client, serializedEnvelope, token);
+        }
+
+        // Virtual because our test project references this.
+        internal virtual async Task SendWithTimeoutInternal(IPipeClientStreamWrapper client, byte[] serializedEnvelope, CancellationToken token)
+        {
             try
             {
                 await client.ConnectAsync(token);
-                _logger.LogInformation("Connected to pipe '{PipeName}' on server '{ServerName}'",
-                    _configuration.PipeName, _configuration.ServerName);
+                _logger.LogInformation("Connected to pipe '{PipeName}' on server '{ServerName}'", Configuration.PipeName, Configuration.ServerName);
                 await client.WriteAsync(serializedEnvelope, 0, serializedEnvelope.Length, token);
-                _logger.LogInformation("Message sent successfully to pipe '{PipeName}'", _configuration.PipeName);
                 await client.FlushAsync(token);
-                _logger.LogInformation("Flush completed for pipe '{PipeName}'", _configuration.PipeName);
+                _logger.LogInformation("Message sent successfully to pipe '{PipeName}'. Client Id: {messageId}", Configuration.PipeName, client.Id);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while sending message to pipe '{PipeName}'", _configuration.PipeName);
-                throw new InvalidOperationException($"Failed to send message to pipe '{_configuration.PipeName}' on server '{_configuration.ServerName}'.", ex);
+                _logger.LogError(ex, "Error occurred while sending message to pipe '{PipeName}'", Configuration.PipeName);
+                throw new InvalidOperationException($"Failed to send message to pipe '{Configuration.PipeName}' on server '{Configuration.ServerName}'.", ex);
             }
         }
     }

@@ -1,8 +1,6 @@
-using System;
 using System.Text;
 using SeroGlint.DotNet.SecurityUtilities;
 using Shouldly;
-using Xunit;
 
 namespace SeroGlint.DotNet.Tests.TestClasses.Security
 {

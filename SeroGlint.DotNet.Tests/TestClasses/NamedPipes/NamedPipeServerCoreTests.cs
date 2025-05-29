@@ -37,7 +37,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             config.SetPipeName(pipeName);
             config.SetServerName(".");
 
-            var pipeServer = new NamedPipeServerCore(config);
+            var pipeServer = new NamedPipeServer(config);
             var messageReceived = false;
 
             pipeServer.MessageReceived += (_, _) =>
@@ -80,7 +80,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             // Inject null pipe name to force exception inside NamedPipeServerStream
             config.SetPipeName(null);
 
-            var pipeServer = new NamedPipeServerCore(config);
+            var pipeServer = new NamedPipeServer(config);
 
             // Act
             var ex = await Assert.ThrowsAsync<Exception>(pipeServer.StartAsync);
@@ -106,7 +106,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             config.SetPipeName(pipeName);
             config.SetServerName(".");
 
-            var pipeServer = new NamedPipeServerCore(config);
+            var pipeServer = new NamedPipeServer(config);
 
             encryptionService.Decrypt(Arg.Any<byte[]>()).Returns(_ => throw new Exception("Decryption failed"));
 

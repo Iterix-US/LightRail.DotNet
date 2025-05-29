@@ -13,14 +13,14 @@ namespace SeroGlint.DotNet.NamedPipes.Servers
     /// <summary>
     /// A named pipe server that handles incoming messages and processes them asynchronously.
     /// </summary>
-    public class NamedPipeServerCore : INamedPipeServerCore
+    public class NamedPipeServer : INamedPipeServer
     {
-        public PipeServerConfiguration Configuration { get; private set; }
+        public PipeServerConfiguration Configuration { get; }
 
         public event PipeMessageReceivedHandler MessageReceived;
         public event PipeResponseRequestedHandler ResponseRequested;
 
-        public NamedPipeServerCore(PipeServerConfiguration configuration)
+        public NamedPipeServer(PipeServerConfiguration configuration)
         {
             Configuration = configuration;
         }

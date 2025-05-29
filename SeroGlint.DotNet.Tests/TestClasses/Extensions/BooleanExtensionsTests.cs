@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SeroGlint.DotNet.Extensions;
+﻿using SeroGlint.DotNet.Extensions;
 using Shouldly;
 
 namespace SeroGlint.DotNet.Tests.TestClasses.Extensions
