@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces;
 using SeroGlint.DotNet.Tests.TestClasses.NamedPipes.TestObjects;
 using SeroGlint.DotNet.Tests.TestObjects;
@@ -98,27 +99,21 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
 
             config.ServerName.Returns(".");
             config.PipeName.Returns("TestPipe");
-            config.CancellationTokenSource.Returns(new CancellationTokenSource(3000));
+            config.CancellationTokenSource.Returns(new CancellationTokenSource(5000));
             config.UseEncryption.Returns(false);
 
             var client = new TestableNamedPipeClient(config, logger);
 
-            // Act
-            string? captured = null;
-            logger
-                .When(x => x.Log(
-                    LogLevel.Information,
-                    Arg.Any<EventId>(),
-                    Arg.Do<object>(state => captured = state.ToString()),
-                    Arg.Any<Exception>(),
-                    Arg.Any<Func<object, Exception, string>>()!))
-                .Do(_ => { });
+            var serverReady = new TaskCompletionSource();
+            var serverTask = TestNamedPipeServer.StartTestServerAsync(config.PipeName, config.CancellationTokenSource.Token, serverReady);
+            await serverReady.Task;
 
-            await client.SendToPipeAsync(envelope, config);
+            // Act & Assert
+            var ex = Assert.ThrowsAsync<Exception>(() => client.SendToPipeAsync(envelope, config));
 
-            // Assert
-            Assert.NotNull(captured);
-            Assert.Contains("Instantiating new client base.", captured);
+            Assert.Null(ex.Exception);
+
+            await serverTask;
         }
     }
 }
