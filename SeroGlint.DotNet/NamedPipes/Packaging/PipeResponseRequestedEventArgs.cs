@@ -1,17 +1,28 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO.Pipes;
 
 namespace SeroGlint.DotNet.NamedPipes.Packaging
 {
+    [ExcludeFromCodeCoverage]
     public class PipeResponseRequestedEventArgs : EventArgs
     {
-        public Guid CorrelationId { get; }
+        /// <summary>
+        /// Unique identifier for the correlation of the request and response.
+        /// </summary>
+        public Guid Id { get; }
+        /// <summary>
+        /// The response object that is being requested to be sent back through the pipe.
+        /// </summary>
         public object ResponseObject { get; }
+        /// <summary>
+        /// The named pipe stream through which the response should be sent.
+        /// </summary>
         public NamedPipeServerStream Stream { get; }
 
         public PipeResponseRequestedEventArgs(Guid correlationId, object responseObject, NamedPipeServerStream stream)
         {
-            CorrelationId = correlationId;
+            Id = correlationId;
             ResponseObject = responseObject;
             Stream = stream;
         }

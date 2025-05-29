@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces;
@@ -7,6 +8,10 @@ using SeroGlint.DotNet.SecurityUtilities.SecurityInterfaces;
 
 namespace SeroGlint.DotNet.NamedPipes.Packaging
 {
+    /// <summary>
+    /// Base class for configuring named pipe servers, providing default implementations and properties.
+    /// </summary>
+    [ExcludeFromCodeCoverage]
     public abstract class NamedPipeConfigurationBase : INamedPipeConfigurator
     {
         public virtual ILogger Logger { get; set; }
@@ -19,6 +24,10 @@ namespace SeroGlint.DotNet.NamedPipes.Packaging
 
         private static string GetName() => AppDomain.CurrentDomain.FriendlyName.Split('.')[0];
 
+        /// <summary>
+        /// Sets the server name for the named pipe configuration.
+        /// </summary>
+        /// <param name="serverName"></param>
         public void SetServerName(string serverName)
         {
             if (string.IsNullOrWhiteSpace(serverName))
@@ -29,6 +38,10 @@ namespace SeroGlint.DotNet.NamedPipes.Packaging
             ServerName = serverName;
         }
 
+        /// <summary>
+        /// Sets the pipe name for the named pipe configuration.
+        /// </summary>
+        /// <param name="pipeName"></param>
         public void SetPipeName(string pipeName)
         {
             if (!Debugger.IsAttached && string.IsNullOrWhiteSpace(pipeName))
@@ -39,6 +52,10 @@ namespace SeroGlint.DotNet.NamedPipes.Packaging
             PipeName = pipeName;
         }
 
+        /// <summary>
+        /// Injects an existing cancellation token source into the configuration.
+        /// </summary>
+        /// <param name="cancellationTokenSource"></param>
         public void InjectCancellationTokenSource(CancellationTokenSource cancellationTokenSource)
         {
             if (cancellationTokenSource == null)

@@ -6,6 +6,9 @@ using SeroGlint.DotNet.SecurityUtilities.SecurityInterfaces;
 
 namespace SeroGlint.DotNet.SecurityUtilities
 {
+    /// <summary>
+    /// Provides AES encryption and decryption functionality.
+    /// </summary>
     public class AesEncryptionService : IEncryptionService
     {
         private byte[] _key;
@@ -16,6 +19,20 @@ namespace SeroGlint.DotNet.SecurityUtilities
         {
             _logger = logger;
             InitializeKey(base64Key);
+        }
+
+        /// <summary>
+        /// Generates a new random AES key encoded in Base64 format.
+        /// </summary>
+        /// <returns></returns>
+        public static string GenerateKey()
+        {
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                var key = new byte[32];
+                rng.GetBytes(key);
+                return Convert.ToBase64String(key);
+            }
         }
 
         private void InitializeKey(string base64Key)
@@ -39,6 +56,12 @@ namespace SeroGlint.DotNet.SecurityUtilities
             }
         }
 
+        /// <summary>
+        /// Encrypts the provided plaintext using AES encryption with the initialized key and IV.
+        /// </summary>
+        /// <param name="plaintext"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
         public byte[] Encrypt(byte[] plaintext)
         {
             if (plaintext == null || plaintext.Length == 0)
@@ -64,6 +87,12 @@ namespace SeroGlint.DotNet.SecurityUtilities
             }
         }
 
+        /// <summary>
+        /// Decrypts the provided ciphertext using AES decryption with the initialized key and IV.
+        /// </summary>
+        /// <param name="ciphertext"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
         public byte[] Decrypt(byte[] ciphertext)
         {
             if (ciphertext == null || ciphertext.Length == 0)

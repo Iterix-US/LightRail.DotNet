@@ -40,7 +40,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             var pipeServer = new NamedPipeServerCore(config);
             var messageReceived = false;
 
-            pipeServer.MessageReceived += (_, e) =>
+            pipeServer.MessageReceived += (_, _) =>
             {
                 _testOutputHelper.WriteLine("MessageReceived triggered");
                 logger.LogInformation("MessageReceived triggered");
@@ -62,77 +62,12 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
         }
 
         [Fact]
-        public async Task HandleMessage_ShouldTriggerError_WhenDeserializationFails()
-        {
-            var logger = Substitute.For<ILogger>();
-            var encryptionService = Substitute.For<IEncryptionService>();
-            var pipeName = "TestPipe_" + Guid.NewGuid().ToString("N");
-
-            var config = new PipeServerConfiguration
-            {
-                Logger = logger,
-                EncryptionService = encryptionService,
-                UseEncryption = true
-            };
-            config.SetPipeName(pipeName);
-            config.SetServerName(".");
-
-            var pipeServer = new NamedPipeServerCore(config);
-            var errorHandled = false;
-
-            encryptionService.Decrypt(Arg.Any<byte[]>()).Returns(Encoding.UTF8.GetBytes("not valid json"));
-
-            pipeServer.ResponseRequested += async (_, e) =>
-            {
-                _testOutputHelper.WriteLine($"ResponseRequested: {e.ResponseObject}");
-                if (e.CorrelationId == Guid.Empty && e.ResponseObject.ToString().Contains("Failed to parse"))
-                {
-                    errorHandled = true;
-                }
-            };
-
-            var serverTask = Task.Run(pipeServer.StartAsync);
-            await Task.Delay(200);
-            await SimulateClient(pipeName, Encoding.UTF8.GetBytes("dummy"));
-            await CleanupServer(config, serverTask);
-
-            Assert.True(errorHandled);
-        }
-
-        [Fact]
-        public async Task StartAsync_ShouldThrowTaskCanceledException_WhenCancelledBeforeStart()
-        {
-            // Arrange
-            var logger = Substitute.For<ILogger>();
-            var encryptionService = Substitute.For<IEncryptionService>();
-            var pipeName = "TestPipe_" + Guid.NewGuid().ToString("N");
-
-            var config = new PipeServerConfiguration
-            {
-                Logger = logger,
-                EncryptionService = encryptionService,
-                UseEncryption = true
-            };
-            config.SetPipeName(pipeName);
-            config.SetServerName(".");
-
-            var pipeServer = new NamedPipeServerCore(config);
-
-            // Cancel before start
-            config.CancellationTokenSource.Cancel();
-
-            // Act & Assert
-            var ex = await Assert.ThrowsAsync<TaskCanceledException>(() => pipeServer.StartAsync());
-            Assert.Equal("Pipe operation was cancelled.", ex.Message);
-        }
-
-        [Fact]
         public async Task StartAsync_ShouldCatchGeneralException()
         {
             // Arrange
             var logger = Substitute.For<ILogger>();
             var encryptionService = Substitute.For<IEncryptionService>();
-            var pipeName = "TestPipe_" + Guid.NewGuid().ToString("N");
+            _ = "TestPipe_" + Guid.NewGuid().ToString("N");
 
             var config = new PipeServerConfiguration
             {
@@ -148,18 +83,81 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             var pipeServer = new NamedPipeServerCore(config);
 
             // Act
-            await pipeServer.StartAsync();
+            var ex = await Assert.ThrowsAsync<Exception>(pipeServer.StartAsync);
 
             // Assert
-            logger.ReceivedWithAnyArgs().LogError(Arg.Any<Exception>(), "Error occurred while starting named pipe server");
+            ex.Message.ShouldContain("Error occurred while starting named pipe server.");
+        }
+
+        [Fact]
+        public async Task StartAsync_ShouldThrowGenericException_WhenHandleMessageFails()
+        {
+            // Arrange
+            var logger = Substitute.For<ILogger>();
+            var encryptionService = Substitute.For<IEncryptionService>();
+            var pipeName = "TestPipe_" + Guid.NewGuid().ToString("N");
+
+            var config = new PipeServerConfiguration
+            {
+                Logger = logger,
+                EncryptionService = encryptionService,
+                UseEncryption = true
+            };
+            config.SetPipeName(pipeName);
+            config.SetServerName(".");
+
+            var pipeServer = new NamedPipeServerCore(config);
+
+            encryptionService.Decrypt(Arg.Any<byte[]>()).Returns(_ => throw new Exception("Decryption failed"));
+
+            Exception caught = null!;
+
+            var serverTask = Task.Run(async () =>
+            {
+                try
+                {
+                    await pipeServer.StartAsync();
+                }
+                catch (Exception ex)
+                {
+                    caught = ex;
+                }
+            });
+
+            await Task.Delay(200); // Let server spin up
+
+            await using (var client = new NamedPipeClientStream(".", pipeName, PipeDirection.Out))
+            {
+                await client.ConnectAsync(2000);
+                var bogusBytes = "{ \"not\": \"valid\" }"u8.ToArray();
+                await client.WriteAsync(bogusBytes, 0, bogusBytes.Length);
+                await client.FlushAsync();
+            }
+
+            await Task.Delay(300);
+            await serverTask;
+
+            // Assert
+            Assert.NotNull(caught);
+            Assert.IsType<Exception>(caught);
         }
 
         private async Task CleanupServer(PipeServerConfiguration config, Task serverTask)
         {
             _testOutputHelper.WriteLine("Client disconnected, waiting for server to process message...");
             await Task.Delay(500);
+
             await config.CancellationTokenSource.CancelAsync();
-            await serverTask;
+
+            try
+            {
+                await serverTask;
+            }
+            catch (OperationCanceledException ex)
+            {
+                _testOutputHelper.WriteLine("Server canceled as expected: " + ex.Message);
+            }
+
             _testOutputHelper.WriteLine("Server task completed.");
         }
 

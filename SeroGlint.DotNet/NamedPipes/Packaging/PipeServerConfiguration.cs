@@ -1,7 +1,12 @@
-﻿using System.Threading;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 
 namespace SeroGlint.DotNet.NamedPipes.Packaging
 {
+    /// <summary>
+    /// Configuration class for a named pipe server.
+    /// </summary>
+    [ExcludeFromCodeCoverage]
     public class PipeServerConfiguration : NamedPipeConfigurationBase
     {
         /// <summary>

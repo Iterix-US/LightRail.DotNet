@@ -1,12 +1,14 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using SeroGlint.DotNet.Extensions;
 using SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces;
+// ReSharper disable MethodOverloadWithOptionalParameter
 
 namespace SeroGlint.DotNet.NamedPipes.Packaging
 {
-    public class PipeEnvelope<T> : IPipeEnvelope
+    public class PipeEnvelope<T> : IPipeEnvelope<T>
     {
         private readonly ILogger _logger;
 
@@ -16,29 +18,45 @@ namespace SeroGlint.DotNet.NamedPipes.Packaging
         public T Payload { get; set; }
 
         /// <summary>
+        /// Default constructor for PipeEnvelope.
+        /// </summary>
+        public PipeEnvelope()
+        {
+            // Empty constructor for serialization purposes.
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the PipeEnvelope class with a logger.
+        /// </summary>
+        /// <param name="logger"></param>
+        public PipeEnvelope(ILogger logger)
+        {
+            _logger = logger;
+        }
+
+        /// <summary>
         /// Serializes the current message to a byte array in JSON format.
         /// </summary>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
         public byte[] Serialize()
         {
-            try
-            {
-                _logger.LogInformation("Serializing message to JSON and encrypting it.");
+            _logger.LogInformation("Serializing message to JSON and encrypting it.");
 
-                var json = this.ToJson();
-                var jsonBytes = Encoding.UTF8.GetBytes(json);
+            var json = this.ToJson();
+            var jsonBytes = Encoding.UTF8.GetBytes(json);
 
-                _logger.LogInformation("Message serialized successfully.");
-                return jsonBytes;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to serialize message.");
-                throw new InvalidOperationException("Failed to serialize message.", ex);
-            }
+            _logger.LogInformation("Message serialized successfully.");
+            return jsonBytes;
         }
 
+        /// <summary>
+        /// Deserializes a JSON string into the specified target object type.
+        /// </summary>
+        /// <typeparam name="TTargetObject"></typeparam>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        [ExcludeFromCodeCoverage] // Tested via the static Deserialize method
         public PipeEnvelope<TTargetObject> Deserialize<TTargetObject>(string json)
         {
             return Deserialize<TTargetObject>(json, _logger);

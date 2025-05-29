@@ -2,8 +2,17 @@
 
 namespace SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces
 {
+    /// <summary>
+    /// Interface for a named pipe client that sends messages to a named pipe server.
+    /// </summary>
     public interface INamedPipeClient
     {
-        Task SendMessage(string serverName, string pipeName, string messageContent, bool encryptMessage);
+        /// <summary>
+        /// Sends a message to the named pipe server using the specified pipe envelope.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="pipeEnvelope"></param>
+        /// <returns></returns>
+        Task SendMessage<T>(IPipeEnvelope<T> pipeEnvelope);
     }
 }

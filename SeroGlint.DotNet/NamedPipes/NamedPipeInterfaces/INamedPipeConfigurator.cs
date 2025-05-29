@@ -4,6 +4,9 @@ using SeroGlint.DotNet.SecurityUtilities.SecurityInterfaces;
 
 namespace SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces
 {
+    /// <summary>
+    /// Interface for configuring named pipe servers, providing properties and methods for setup.
+    /// </summary>
     public interface INamedPipeConfigurator
     {
         /// <summary>
