@@ -132,5 +132,69 @@ namespace SeroGlint.DotNet.NamedPipes
                 throw new InvalidOperationException($"Failed to send message to pipe '{Configuration.PipeName}' on server '{Configuration.ServerName}'.", ex);
             }
         }
+
+        public async Task<string> SendAndReceiveAsync<T>(IPipeEnvelope<T> message)
+        {
+            if (!ValidateMessageSettings(Configuration.ServerName, Configuration.PipeName, message))
+            {
+                return null;
+            }
+
+            var serializedEnvelope = message.Serialize();
+            if (Configuration.UseEncryption)
+            {
+                _logger.LogInformation("Encrypting message before sending.");
+                serializedEnvelope = Configuration.EncryptionService.Encrypt(serializedEnvelope);
+            }
+
+            var clientStream = new NamedPipeClientStream(
+                Configuration.ServerName,
+                Configuration.PipeName,
+                PipeDirection.InOut,
+                PipeOptions.Asynchronous);
+
+            var client = new PipeClientStreamWrapper(clientStream);
+
+            using (client)
+            {
+                try
+                {
+                    await client.ConnectAsync(Configuration.CancellationTokenSource.Token);
+                    _logger.LogInformation("Connected to pipe '{PipeName}' on server '{ServerName}'", Configuration.PipeName, Configuration.ServerName);
+
+                    await client.WriteAsync(serializedEnvelope, 0, serializedEnvelope.Length, Configuration.CancellationTokenSource.Token);
+                    await client.FlushAsync(Configuration.CancellationTokenSource.Token);
+
+                    var buffer = new byte[4096];
+                    var bytesRead = await client.ReadAsync(buffer, 0, buffer.Length, Configuration.CancellationTokenSource.Token);
+                    
+                    if (bytesRead <= 0)
+                    {
+                        _logger.LogWarning("No response received from server on pipe '{PipeName}'", Configuration.PipeName);
+                        return null;
+                    }
+
+                    var responseBytes = new byte[bytesRead];
+                    Array.Copy(buffer, responseBytes, bytesRead);
+
+                    if (Configuration.UseEncryption)
+                    {
+                        responseBytes = Configuration.EncryptionService.Decrypt(responseBytes);
+                    }
+
+                    var responseJson = Encoding.UTF8.GetString(responseBytes);
+                    _logger.LogInformation("Received response from server: {Json}", responseJson);
+                    return responseJson;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error occurred during SendAndReceiveAsync on pipe '{PipeName}'", Configuration.PipeName);
+                    throw;
+                }
+            }
+
+            return null;
+        }
+
     }
 }

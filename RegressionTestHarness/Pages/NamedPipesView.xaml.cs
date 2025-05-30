@@ -63,7 +63,7 @@ namespace RegressionTestHarness.Pages
 
         private async void btnStartServer_Click(object sender, RoutedEventArgs e)
         {
-            await _namedPipeServer.StartAsync();
+            _ = Task.Run(_namedPipeServer.StartAsync);
         }
 
         private void btnStopServer_Click(object sender, RoutedEventArgs e)

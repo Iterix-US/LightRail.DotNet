@@ -4,9 +4,11 @@ using System.IO.Pipes;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using SeroGlint.DotNet.Extensions;
 using SeroGlint.DotNet.NamedPipes.Delegates;
 using SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces;
 using SeroGlint.DotNet.NamedPipes.Packaging;
+using SeroGlint.DotNet.SecurityUtilities.SecurityInterfaces;
 
 namespace SeroGlint.DotNet.NamedPipes.Servers
 {
@@ -98,7 +100,7 @@ namespace SeroGlint.DotNet.NamedPipes.Servers
             }
         }
 
-        private void HandleMessage<TTargetType>(int bytesRead, byte[] buffer, NamedPipeServerStream server)
+        private async Task HandleMessage<TTargetType>(int bytesRead, byte[] buffer, NamedPipeServerStream server)
         {
             try
             {
@@ -124,6 +126,8 @@ namespace SeroGlint.DotNet.NamedPipes.Servers
                             deserialized.MessageId,
                             envelope,
                             server));
+
+                await SendResponseAsync(envelope, server, Configuration.UseEncryption ? Configuration.EncryptionService : null);
             }
             catch (Exception ex)
             {
@@ -146,5 +150,26 @@ namespace SeroGlint.DotNet.NamedPipes.Servers
         [ExcludeFromCodeCoverage]
         public void Dispose() => 
             Configuration.Logger.LogInformation($"Server disposed [{Configuration.ServerName} -> {Configuration.PipeName}]");
+
+        public static async Task SendResponseAsync(
+            PipeEnvelope<dynamic> response,
+            NamedPipeServerStream stream,
+            IEncryptionService encryptionService = null)
+        {
+            if (stream == null || !stream.IsConnected)
+                return;
+
+            var json = response.ToJson();
+            var bytes = Encoding.UTF8.GetBytes(json);
+
+            if (encryptionService != null)
+            {
+                bytes = encryptionService.Encrypt(bytes);
+            }
+
+            await stream.WriteAsync(bytes, 0, bytes.Length);
+            await stream.FlushAsync();
+        }
+
     }
 }

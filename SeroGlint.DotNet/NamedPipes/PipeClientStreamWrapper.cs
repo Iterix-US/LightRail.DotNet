@@ -37,5 +37,10 @@ namespace SeroGlint.DotNet.NamedPipes
         {
             _pipeClientStream?.Dispose();
         }
+
+        public async Task<int> ReadAsync(byte[] buffer, int i, int bufferLength, CancellationToken token)
+        {
+            return await _pipeClientStream.ReadAsync(buffer, i, bufferLength, token);
+        }
     }
 }
