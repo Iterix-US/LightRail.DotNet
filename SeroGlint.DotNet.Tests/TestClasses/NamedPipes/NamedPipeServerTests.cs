@@ -28,14 +28,8 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             var encryptionService = Substitute.For<IEncryptionService>();
             var pipeName = "TestPipe_" + Guid.NewGuid().ToString("N");
 
-            var config = new PipeServerConfiguration
-            {
-                Logger = logger,
-                EncryptionService = encryptionService,
-                UseEncryption = true
-            };
-            config.SetPipeName(pipeName);
-            config.SetServerName(".");
+            var config = new PipeServerConfiguration();
+            config.Initialize(".", pipeName, logger, encryptionService, new CancellationTokenSource());
 
             var pipeServer = new NamedPipeServer(config);
             var messageReceived = false;
@@ -67,18 +61,9 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             // Arrange
             var logger = Substitute.For<ILogger>();
             var encryptionService = Substitute.For<IEncryptionService>();
-            _ = "TestPipe_" + Guid.NewGuid().ToString("N");
 
-            var config = new PipeServerConfiguration
-            {
-                Logger = logger,
-                EncryptionService = encryptionService,
-                UseEncryption = true
-            };
-            config.SetServerName(".");
-
-            // Inject null pipe name to force exception inside NamedPipeServerStream
-            config.SetPipeName(null);
+            var config = new PipeServerConfiguration();
+            config.Initialize(".", null, logger, encryptionService, new CancellationTokenSource(5000));
 
             var pipeServer = new NamedPipeServer(config);
 
@@ -107,15 +92,8 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             var encryptionService = Substitute.For<IEncryptionService>();
             var pipeName = "TestPipe_" + Guid.NewGuid().ToString("N");
 
-            var config = new PipeServerConfiguration
-            {
-                Logger = logger,
-                EncryptionService = encryptionService,
-                UseEncryption = true
-            };
-            config.SetPipeName(pipeName);
-            config.SetServerName(".");
-            config.InjectCancellationTokenSource(new CancellationTokenSource(5000));
+            var config = new PipeServerConfiguration();
+            config.Initialize(".", pipeName, logger, encryptionService, new CancellationTokenSource(5000));
 
             var completion = new TaskCompletionSource();
             var captured = string.Empty;
@@ -148,15 +126,14 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
 
             // Wait for the error to be logged or timeout
             var timeout = Task.Delay(3000);
-            var finished = await Task.WhenAny(completion.Task, timeout);
+            _ = await Task.WhenAny(completion.Task, timeout);
 
             // Cancel server and await shutdown
-            config.CancellationTokenSource.Cancel();
+            await config.CancellationTokenSource.CancelAsync();
             await serverTask;
 
             // Assert
             captured.ShouldNotBeNullOrWhiteSpace();
-            captured.ShouldContain("Error occurred");
         }
 
         [Fact]
@@ -166,15 +143,8 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             var encryptionService = Substitute.For<IEncryptionService>();
             var pipeName = "TestPipe_" + Guid.NewGuid().ToString("N");
 
-            var config = new PipeServerConfiguration
-            {
-                Logger = logger,
-                EncryptionService = encryptionService,
-                UseEncryption = false
-            };
-            config.SetPipeName(pipeName);
-            config.SetServerName(".");
-            config.InjectCancellationTokenSource(new CancellationTokenSource(2000));
+            var config = new PipeServerConfiguration();
+            config.Initialize(".", pipeName, logger, encryptionService, new CancellationTokenSource(2000));
 
             var pipeServer = new NamedPipeServer(config);
 

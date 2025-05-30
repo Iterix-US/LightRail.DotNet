@@ -37,7 +37,7 @@ namespace SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces
         /// <summary>
         /// The encryption service used for securing messages.
         /// </summary>
-        IEncryptionService EncryptionService { get; set; }
+        IEncryptionService EncryptionService { get; }
 
         /// <summary>
         /// Cancellation token source for managing cancellation of named pipe operations.
