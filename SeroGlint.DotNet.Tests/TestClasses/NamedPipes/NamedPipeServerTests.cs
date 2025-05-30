@@ -12,11 +12,11 @@ using Xunit.Abstractions;
 
 namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
 {
-    public class NamedPipeServerCoreTests
+    public class NamedPipeServerTests
     {
         private readonly ITestOutputHelper _testOutputHelper;
 
-        public NamedPipeServerCoreTests(ITestOutputHelper testOutputHelper)
+        public NamedPipeServerTests(ITestOutputHelper testOutputHelper)
         {
             _testOutputHelper = testOutputHelper;
         }
@@ -83,14 +83,24 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             var pipeServer = new NamedPipeServer(config);
 
             // Act
-            var ex = await Assert.ThrowsAsync<Exception>(pipeServer.StartAsync);
+            var captured = string.Empty;
+            logger
+                .When(x => x.Log(
+                    LogLevel.Trace,
+                    Arg.Any<EventId>(),
+                    Arg.Do<object>(state => captured = state.ToString()),
+                    Arg.Any<Exception>(),
+                    Arg.Any<Func<object, Exception, string>>()!))
+                .Do(_ => { });
+
+            await pipeServer.StartAsync();
 
             // Assert
-            ex.Message.ShouldContain("Error occurred while starting named pipe server.");
+            captured.ShouldContain("Error occurred");
         }
 
         [Fact]
-        public async Task StartAsync_ShouldThrowGenericException_WhenHandleMessageFails()
+        public async Task StartAsync_ShouldLogAndDieGracefully_WhenHandleMessageFails()
         {
             // Arrange
             var logger = Substitute.For<ILogger>();
@@ -105,41 +115,98 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             };
             config.SetPipeName(pipeName);
             config.SetServerName(".");
+            config.InjectCancellationTokenSource(new CancellationTokenSource(5000));
+
+            var completion = new TaskCompletionSource();
+            var captured = string.Empty;
+
+            logger.When(x => x.Log(
+                LogLevel.Trace,
+                Arg.Any<EventId>(),
+                Arg.Do<object>(state =>
+                {
+                    captured = state.ToString();
+                    completion.TrySetResult();
+                }),
+                Arg.Any<Exception>(),
+                Arg.Any<Func<object, Exception, string>>()!)).Do(_ => { });
 
             var pipeServer = new NamedPipeServer(config);
 
-            encryptionService.Decrypt(Arg.Any<byte[]>()).Returns(_ => throw new Exception("Decryption failed"));
-
-            Exception caught = null!;
-
-            var serverTask = Task.Run(async () =>
-            {
-                try
-                {
-                    await pipeServer.StartAsync();
-                }
-                catch (Exception ex)
-                {
-                    caught = ex;
-                }
-            });
+            // Start server in background so it remains running while client sends
+            var serverTask = Task.Run(pipeServer.StartAsync);
 
             await Task.Delay(200); // Let server spin up
 
             await using (var client = new NamedPipeClientStream(".", pipeName, PipeDirection.Out))
             {
-                await client.ConnectAsync(2000);
+                await client.ConnectAsync(config.CancellationTokenSource.Token);
                 var bogusBytes = "{ \"not\": \"valid\" }"u8.ToArray();
                 await client.WriteAsync(bogusBytes, 0, bogusBytes.Length);
                 await client.FlushAsync();
             }
 
-            await Task.Delay(300);
+            // Wait for the error to be logged or timeout
+            var timeout = Task.Delay(3000);
+            var finished = await Task.WhenAny(completion.Task, timeout);
+
+            // Cancel server and await shutdown
+            config.CancellationTokenSource.Cancel();
             await serverTask;
 
             // Assert
-            Assert.NotNull(caught);
-            Assert.IsType<Exception>(caught);
+            captured.ShouldNotBeNullOrWhiteSpace();
+            captured.ShouldContain("Error occurred");
+        }
+
+        [Fact]
+        public async Task HandlePipeStream_ShouldExitNormally_WhenValidMessageReceived()
+        {
+            var logger = Substitute.For<ILogger>();
+            var encryptionService = Substitute.For<IEncryptionService>();
+            var pipeName = "TestPipe_" + Guid.NewGuid().ToString("N");
+
+            var config = new PipeServerConfiguration
+            {
+                Logger = logger,
+                EncryptionService = encryptionService,
+                UseEncryption = false
+            };
+            config.SetPipeName(pipeName);
+            config.SetServerName(".");
+            config.InjectCancellationTokenSource(new CancellationTokenSource(2000));
+
+            var pipeServer = new NamedPipeServer(config);
+
+            var messageReceived = false;
+            pipeServer.MessageReceived += (_, _) => messageReceived = true;
+
+            var serverTask = pipeServer.StartAsync();
+            await Task.Delay(200);
+
+            await using (var client = new NamedPipeClientStream(".", pipeName, PipeDirection.Out))
+            {
+                await client.ConnectAsync(config.CancellationTokenSource.Token);
+
+                var payload = new SerializationObject { Id = 42, Name = "Valid" };
+                var envelope = new PipeEnvelope<SerializationObject>
+                {
+                    Payload = payload
+                };
+
+                var json = envelope.ToJson();
+                var bytes = Encoding.UTF8.GetBytes(json);
+                encryptionService.Decrypt(Arg.Any<byte[]>()).Returns(bytes);
+
+                await client.WriteAsync(bytes);
+                await client.FlushAsync();
+            }
+
+            await Task.Delay(500);
+            await config.CancellationTokenSource.CancelAsync();
+            await serverTask;
+
+            Assert.True(messageReceived);
         }
 
         private async Task CleanupServer(PipeServerConfiguration config, Task serverTask)

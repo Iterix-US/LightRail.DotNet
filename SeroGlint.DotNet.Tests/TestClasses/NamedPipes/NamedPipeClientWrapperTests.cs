@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
+using SeroGlint.DotNet.NamedPipes;
 using SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces;
 using SeroGlint.DotNet.Tests.TestClasses.NamedPipes.TestObjects;
 using SeroGlint.DotNet.Tests.TestObjects;
@@ -83,6 +84,51 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             Assert.NotNull(captured);
             Assert.Contains(testId.ToString(), captured);
         }
+
+        [Fact]
+        public async Task SendToPipeAsync_ShouldUseInjectedWrapper()
+        {
+            var logger = Substitute.For<ILogger>();
+            var config = Substitute.For<INamedPipeConfigurator>();
+            var envelope = Substitute.For<IPipeEnvelope<SerializationObject>>();
+            var wrapper = Substitute.For<IPipeClientStreamWrapper>();
+
+            var testId = Guid.NewGuid();
+            var payload = new byte[] { 0x1, 0x2 };
+
+            config.ServerName.Returns("TestHost");
+            config.PipeName.Returns("TestPipe");
+            config.UseEncryption.Returns(false);
+            config.CancellationTokenSource.Returns(new CancellationTokenSource(1000));
+
+            wrapper.Id.Returns(testId);
+            wrapper.ConnectAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+            wrapper.WriteAsync(Arg.Any<byte[]>(), 0, 2, Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+            wrapper.FlushAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+
+            envelope.Payload.Returns(new SerializationObject { Id = 1, Name = "data" });
+            envelope.Serialize().Returns(payload);
+
+            var client = new NamedPipeClient(config, logger, wrapper);
+
+            // Act
+            string? captured = null;
+            logger
+                .When(x => x.Log(
+                    LogLevel.Information,
+                    Arg.Any<EventId>(),
+                    Arg.Do<object>(state => captured = state.ToString()),
+                    Arg.Any<Exception>(),
+                    Arg.Any<Func<object, Exception, string>>()!))
+                .Do(_ => { });
+
+            await client.SendMessage(envelope);
+
+            // Assert
+            Assert.NotNull(captured);
+            Assert.Contains(testId.ToString(), captured);
+        }
+
 
         [Fact]
         public async Task SendWithTimeout_ShouldUseNewWrapper_WhenNoWrapperInjected()

@@ -45,20 +45,13 @@ namespace SeroGlint.DotNet.NamedPipes.Servers
                     await HandlePipeStream(server);
                 }
             }
-            catch (OperationCanceledException ex)
-            {
-                Configuration.Logger.LogInformation("Operation cancelled on pipe '{PipeName}'", Configuration.PipeName);
-                throw new OperationCanceledException("Pipe operation was cancelled.", ex);
-            }
             catch (Exception ex)
             {
-                Configuration.Logger.LogError(ex, "Error occurred while starting named pipe server");
+                Configuration.Logger.LogTrace(ex, "Error occurred while starting named pipe server");
                 ResponseRequested?.Invoke(this, new PipeResponseRequestedEventArgs(
                     Guid.Empty,
                     $"Error starting pipe server: {ex.Message}",
                     null));
-
-                throw new Exception("Error occurred while starting named pipe server.", ex);
             }
         }
 
@@ -83,23 +76,13 @@ namespace SeroGlint.DotNet.NamedPipes.Servers
                     HandleMessage<dynamic>(bytesRead, buffer, server);
                 }
             }
-            catch (OperationCanceledException ex)
-            {
-                Configuration.Logger.LogInformation("Operation cancelled on pipe '{PipeName}'", Configuration.PipeName);
-                ResponseRequested?.Invoke(this, new PipeResponseRequestedEventArgs(
-                    Guid.Empty,
-                    $"Error handling pipe: {ex.Message}",
-                    server));
-                throw new OperationCanceledException("Pipe operation was cancelled.", ex);
-            }
             catch (Exception ex)
             {
-                Configuration.Logger.LogError(ex, "Error occurred while handling pipe '{PipeName}'", Configuration.PipeName);
+                Configuration.Logger.LogTrace(ex, "Error occurred while handling pipe '{PipeName}'", Configuration.PipeName);
                 ResponseRequested?.Invoke(this, new PipeResponseRequestedEventArgs(
                     Guid.Empty,
                     $"Error handling pipe: {ex.Message}",
                     server));
-                throw new Exception("Error occurred while handling pipe operation.");
             }
         }
 
@@ -133,8 +116,6 @@ namespace SeroGlint.DotNet.NamedPipes.Servers
                     Guid.Empty,
                     errorMessage,
                     server));
-
-                throw new Exception("Pipe message handling failed", ex);
             }
         }
 

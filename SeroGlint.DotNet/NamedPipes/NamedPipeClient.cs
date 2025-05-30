@@ -88,6 +88,7 @@ namespace SeroGlint.DotNet.NamedPipes
             if (_pipeClientStreamWrapper != null)
             {
                 client = _pipeClientStreamWrapper;
+                _logger.LogInformation($"Using injected pipe client stream wrapper with Id {client.Id}");
             }
             else
             {

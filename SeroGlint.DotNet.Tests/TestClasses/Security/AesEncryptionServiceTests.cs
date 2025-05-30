@@ -54,5 +54,18 @@ namespace SeroGlint.DotNet.Tests.TestClasses.Security
 
             Assert.Throws<ArgumentException>(() => service.Decrypt(Array.Empty<byte>()));
         }
+
+        [Fact]
+        public void GenerateKey_ShouldReturnValidBase64Encoded32ByteKey()
+        {
+            // Act
+            var key = AesEncryptionService.GenerateKey();
+
+            // Assert
+            Assert.False(string.IsNullOrWhiteSpace(key));
+
+            byte[] keyBytes = Convert.FromBase64String(key);
+            Assert.Equal(32, keyBytes.Length);
+        }
     }
 }
