@@ -14,13 +14,13 @@ namespace SeroGlint.DotNet.NamedPipes.Packaging
         /// <summary>
         /// The response object that is being requested to be sent back through the pipe.
         /// </summary>
-        public object ResponseObject { get; }
+        public PipeEnvelope<dynamic> ResponseObject { get; }
         /// <summary>
         /// The named pipe stream through which the response should be sent.
         /// </summary>
         public NamedPipeServerStream Stream { get; }
 
-        public PipeResponseRequestedEventArgs(Guid correlationId, object responseObject, NamedPipeServerStream stream)
+        public PipeResponseRequestedEventArgs(Guid correlationId, PipeEnvelope<dynamic> responseObject, NamedPipeServerStream stream)
         {
             Id = correlationId;
             ResponseObject = responseObject;

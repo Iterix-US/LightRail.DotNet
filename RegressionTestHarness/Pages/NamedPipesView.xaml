@@ -64,6 +64,7 @@
 
                 <TextBlock 
                     Grid.Row="0"
+                    Grid.Column="0"
                     Text="Server Status:" 
                     HorizontalAlignment="Left" 
                     VerticalAlignment="Top" 
@@ -71,6 +72,7 @@
 
                 <TextBlock 
                     Grid.Row="0"
+                    Grid.Column="0"
                     Text="Not running" 
                     HorizontalAlignment="Left" 
                     VerticalAlignment="Top" 
@@ -78,13 +80,23 @@
                     Margin="115, 0, 0, 0" 
                     FontWeight="Bold" />
 
-                <Grid Grid.Row="1">
+                <Grid Grid.Row="1" Grid.Column="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="10" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
                     <Border 
-                        HorizontalAlignment="Left" 
+                        Grid.Column="0"
+                        x:Name="BrdServerLog"
+                        HorizontalAlignment="Stretch" 
                         VerticalAlignment="Stretch"
                         BorderThickness="1" 
                         BorderBrush="Black">
-                        <Grid>
+                        <Grid
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="30"/>
                                 <RowDefinition Height="*" />
@@ -109,18 +121,19 @@
                             <ListBox 
                                 x:Name="LstServerLog"
                                 Grid.Row="1"
-                                HorizontalAlignment="Left" 
+                                HorizontalAlignment="Stretch" 
                                 VerticalAlignment="Stretch"
-                                Width="150"
+                                MinWidth="150"
                                 Background="Transparent"
                                 Foreground="DarkSlateGray"/>
                         </Grid>
                     </Border>
 
                     <Border 
-                        HorizontalAlignment="Left" 
+                        Grid.Column="2"
+                        x:Name="BrdClientLog"
+                        HorizontalAlignment="Stretch" 
                         VerticalAlignment="Stretch"
-                        Margin="160, 0, 0, 0"
                         BorderThickness="1" 
                         BorderBrush="Black">
                         <Grid>
@@ -148,9 +161,9 @@
                             <ListBox 
                                 x:Name="LstClientLog"
                                 Grid.Row="1"
-                                HorizontalAlignment="Left" 
+                                HorizontalAlignment="Stretch" 
                                 VerticalAlignment="Stretch"
-                                Width="150"
+                                MinWidth="150"
                                 Background="Transparent"
                                 Foreground="DarkSlateGray"/>
                         </Grid>

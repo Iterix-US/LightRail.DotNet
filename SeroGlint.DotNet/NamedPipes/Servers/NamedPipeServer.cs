@@ -48,9 +48,15 @@ namespace SeroGlint.DotNet.NamedPipes.Servers
             catch (Exception ex)
             {
                 Configuration.Logger.LogTrace(ex, "Error occurred while starting named pipe server");
+
+                var envelope = new PipeEnvelope<dynamic>
+                {
+                    Payload = $"Error starting pipe server: {ex.Message}"
+                };
+
                 ResponseRequested?.Invoke(this, new PipeResponseRequestedEventArgs(
                     Guid.Empty,
-                    $"Error starting pipe server: {ex.Message}",
+                    envelope,
                     null));
             }
         }
@@ -79,9 +85,15 @@ namespace SeroGlint.DotNet.NamedPipes.Servers
             catch (Exception ex)
             {
                 Configuration.Logger.LogTrace(ex, "Error occurred while handling pipe '{PipeName}'", Configuration.PipeName);
+                
+                var envelope = new PipeEnvelope<dynamic>
+                {
+                    Payload = $"Error handling pipe: {ex.Message}"
+                };
+
                 ResponseRequested?.Invoke(this, new PipeResponseRequestedEventArgs(
                     Guid.Empty,
-                    $"Error handling pipe: {ex.Message}",
+                    envelope,
                     server));
             }
         }
@@ -100,21 +112,33 @@ namespace SeroGlint.DotNet.NamedPipes.Servers
 
                 Configuration.Logger.LogInformation($"Received message on pipe. Message Id: {deserialized.MessageId}");
                 MessageReceived?.Invoke(this, new PipeMessageReceivedEventArgs(message, deserialized));
+
+                var envelope = new PipeEnvelope<dynamic>
+                {
+                    Payload = $"Received message on pipe. Message Id: {deserialized.MessageId}"
+                };
+
                 ResponseRequested?
                     .Invoke(this,
                         new PipeResponseRequestedEventArgs(
                             deserialized.MessageId,
-                            $"Message received. Id: {deserialized.MessageId}",
+                            envelope,
                             server));
             }
             catch (Exception ex)
             {
-                var errorMessage = "Failed to parse message from pipe";
+                var errorMessage = "Error parsing message from pipe";
                 Configuration.Logger.LogTrace(ex, errorMessage);
+
+                var envelope = new PipeEnvelope<dynamic>
+                {
+                    Payload = $"{errorMessage}: {ex.Message}"
+                };
+
                 ResponseRequested?.Invoke(this,
                     new PipeResponseRequestedEventArgs(
                     Guid.Empty,
-                    errorMessage,
+                    envelope,
                     server));
             }
         }

@@ -134,6 +134,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
 
             // Assert
             captured.ShouldNotBeNullOrWhiteSpace();
+            captured.ShouldContain("Error");
         }
 
         [Fact]
