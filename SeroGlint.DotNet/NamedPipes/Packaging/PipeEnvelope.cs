@@ -87,7 +87,7 @@ namespace SeroGlint.DotNet.NamedPipes.Packaging
             {
                 const string errorMessage = "Failed to deserialize message.";
                 logger?.LogError(ex, errorMessage);
-                throw new InvalidOperationException(errorMessage, ex);
+                return null;
             }
         }
     }

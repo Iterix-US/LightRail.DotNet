@@ -11,36 +11,36 @@ namespace SeroGlint.DotNet.NamedPipes
     public class PipeClientStreamWrapper : IPipeClientStreamWrapper
     {
         public Guid Id { get; } = Guid.NewGuid();
-        private readonly NamedPipeClientStream _pipeClientStream;
+        public NamedPipeClientStream ClientStream { get; }
 
         public PipeClientStreamWrapper(NamedPipeClientStream pipeClientStream = null)
         {
-            _pipeClientStream = pipeClientStream;
+            ClientStream = pipeClientStream;
         }
 
         public async Task ConnectAsync(CancellationToken token)
         {
-            await _pipeClientStream.ConnectAsync(token);
+            await ClientStream.ConnectAsync(token);
         }
 
         public async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken token)
         {
-            await _pipeClientStream.WriteAsync(buffer, offset, count, token);
+            await ClientStream.WriteAsync(buffer, offset, count, token);
         }
 
         public async Task FlushAsync(CancellationToken token)
         {
-            await _pipeClientStream.FlushAsync(token);
+            await ClientStream.FlushAsync(token);
         }
 
         public void Dispose()
         {
-            _pipeClientStream?.Dispose();
+            ClientStream?.Dispose();
         }
 
         public async Task<int> ReadAsync(byte[] buffer, int i, int bufferLength, CancellationToken token)
         {
-            return await _pipeClientStream.ReadAsync(buffer, i, bufferLength, token);
+            return await ClientStream.ReadAsync(buffer, i, bufferLength, token);
         }
     }
 }

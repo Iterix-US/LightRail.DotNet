@@ -36,7 +36,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             var client = new TestableNamedPipeClient(config, logger, pipeWrapper);
 
             // Act & Assert
-            var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => client.SendMessage(envelope));
+            var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => client.Send(envelope));
             Assert.Contains("Failed to send message to pipe", ex.Message);
         }
 
@@ -78,7 +78,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
                     Arg.Any<Func<object, Exception, string>>()!))
                 .Do(_ => { });
 
-            await client.SendMessage(envelope);
+            await client.Send(envelope);
 
             // Assert
             Assert.NotNull(captured);
@@ -122,7 +122,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
                     Arg.Any<Func<object, Exception, string>>()!))
                 .Do(_ => { });
 
-            await client.SendMessage(envelope);
+            await client.Send(envelope);
 
             // Assert
             Assert.NotNull(captured);
@@ -155,9 +155,9 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             await serverReady.Task;
 
             // Act & Assert
-            var ex = Assert.ThrowsAsync<Exception>(() => client.SendToPipeAsync(envelope, config));
+            var response = client.Send(envelope);
 
-            Assert.Null(ex.Exception);
+            Assert.Null(response);
 
             await serverTask;
         }

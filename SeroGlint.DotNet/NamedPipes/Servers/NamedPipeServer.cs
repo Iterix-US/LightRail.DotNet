@@ -35,6 +35,14 @@ namespace SeroGlint.DotNet.NamedPipes.Servers
         /// <exception cref="Exception"></exception>
         public async Task StartAsync()
         {
+            while (!Configuration.CancellationTokenSource.IsCancellationRequested)
+            {
+                await Start();
+            }
+        }
+
+        private async Task Start()
+        {
             try
             {
                 using (var server = new NamedPipeServerStream(
@@ -72,22 +80,19 @@ namespace SeroGlint.DotNet.NamedPipes.Servers
                 Configuration.Logger.LogInformation("Client connected on '{PipeName}'", Configuration.PipeName);
 
                 var buffer = new byte[4096];
-                while (server.IsConnected || !Configuration.CancellationTokenSource.IsCancellationRequested)
+                Configuration.Logger.LogInformation("Waiting for messages on pipe '{PipeName}'...", Configuration.PipeName);
+                var bytesRead = await server.ReadAsync(buffer, 0, buffer.Length, Configuration.CancellationTokenSource.Token);
+                if (bytesRead == 0)
                 {
-                    Configuration.Logger.LogInformation("Waiting for messages on pipe '{PipeName}'...", Configuration.PipeName);
-                    var bytesRead = await server.ReadAsync(buffer, 0, buffer.Length, Configuration.CancellationTokenSource.Token);
-                    if (bytesRead == 0)
-                    {
-                        continue;
-                    }
-
-                    HandleMessage<dynamic>(bytesRead, buffer, server);
+                    return;
                 }
+
+                await HandleMessage<dynamic>(bytesRead, buffer, server);
             }
             catch (Exception ex)
             {
                 Configuration.Logger.LogTrace(ex, "Error occurred while handling pipe '{PipeName}'", Configuration.PipeName);
-                
+
                 var envelope = new PipeEnvelope<dynamic>
                 {
                     Payload = $"Error handling pipe: {ex.Message}"
@@ -148,7 +153,7 @@ namespace SeroGlint.DotNet.NamedPipes.Servers
         }
 
         [ExcludeFromCodeCoverage]
-        public void Dispose() => 
+        public void Dispose() =>
             Configuration.Logger.LogInformation($"Server disposed [{Configuration.ServerName} -> {Configuration.PipeName}]");
 
         public static async Task SendResponseAsync(

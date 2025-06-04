@@ -79,7 +79,7 @@ namespace RegressionTestHarness.Pages
             };
 
             var client = new NamedPipeClient(_configuration, _clientLogger);
-            await client.SendMessage(envelope);
+            await client.Send(envelope);
         }
 
         private void btnClearServerLog_Click(object sender, RoutedEventArgs e)

@@ -8,17 +8,16 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes.TestObjects
         INamedPipeConfigurator config,
         ILogger logger,
         IPipeClientStreamWrapper? wrapper = null)
-        : NamedPipeClient(config, logger)
+        : NamedPipeClient(config, logger, wrapper)
     {
-        public override async Task SendMessage<T>(IPipeEnvelope<T> message)
+        public override async Task<string> Send<T>(IPipeEnvelope<T> message)
         {
             if (!ValidateMessageSettings(Configuration.ServerName, Configuration.PipeName, message))
             {
-                return;
+                return "Pipe envelop was empty. Refusing to send.";
             }
 
-            var serializedEnvelope = message.Serialize();
-            await SendWithTimeoutInternal(wrapper, serializedEnvelope, Configuration.CancellationTokenSource.Token);
+            return await Send(message);
         }
     }
 }

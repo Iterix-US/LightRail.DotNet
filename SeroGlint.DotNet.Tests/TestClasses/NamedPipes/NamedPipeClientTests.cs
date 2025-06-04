@@ -1,5 +1,4 @@
-﻿using System.IO.Pipes;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using NSubstitute;
 using SeroGlint.DotNet.NamedPipes;
 using SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces;
@@ -8,6 +7,7 @@ using SeroGlint.DotNet.SecurityUtilities.SecurityInterfaces;
 using SeroGlint.DotNet.Tests.TestClasses.NamedPipes.TestObjects;
 using SeroGlint.DotNet.Tests.TestObjects;
 using SeroGlint.DotNet.Tests.Utilities;
+using Shouldly;
 using static NSubstitute.Arg;
 #pragma warning disable CA1416
 
@@ -50,7 +50,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             var client = new NamedPipeClient(config, _logger);
 
             // Act
-            await client.SendMessage(envelope);
+            await client.Send(envelope);
 
             // Assert
             Assert.Contains("Server name cannot be null or whitespace", capturedMessage);
@@ -84,7 +84,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             var client = new NamedPipeClient(config, _logger);
 
             // Act
-            await client.SendMessage(envelope);
+            await client.Send(envelope);
 
             // Assert
             Assert.Contains("Pipe name cannot be null or whitespace", capturedMessage);
@@ -117,7 +117,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             var client = new TestableNamedPipeClient(config, logger, pipeWrapper);
 
             // Act & Assert
-            var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => client.SendMessage(envelope));
+            var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => client.Send(envelope));
             Assert.Contains("Failed to send message to pipe", ex.Message);
         }
 
@@ -143,12 +143,22 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             config.UseEncryption.Returns(false);
             config.EncryptionService.Returns(Substitute.For<IEncryptionService>());
 
+            var capturedMessage = string.Empty;
+            _logger
+                .When(x => x.Log(
+                    LogLevel.Information,
+                    Arg.Any<EventId>(),
+                    Arg.Do<object>(state => capturedMessage = state.ToString()),
+                    Arg.Any<Exception>(),
+                    Arg.Any<Func<object, Exception, string>>()!))
+                .Do(_ => { });
+
             var serverTask = TestNamedPipeServer.StartTestServerAsync(config.PipeName, config.CancellationTokenSource.Token);
             var client = new NamedPipeClient(config, _logger);
 
             // Act & Assert
-            await client.SendMessage(envelope);
-            _logger.Received().LogInformation("Encrypting message before sending.");
+            await client.Send(envelope);
+            capturedMessage.ShouldContain("received response from server");
             await serverTask;
         }
 
@@ -179,7 +189,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             await Task.Delay(100); // Let server start
 
             var client = new NamedPipeClient(config, _logger);
-            await client.SendMessage(envelope);
+            await client.Send(envelope);
 
             encryption.Received().Encrypt(Any<byte[]>());
             _logger.Received().LogInformation("Encrypting message before sending.");
@@ -215,7 +225,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             var client = new NamedPipeClient(config, _logger);
 
             // Act
-            await client.SendMessage(envelope);
+            await client.Send(envelope);
 
             // Assert
             Assert.Contains("Server name cannot be null or whitespace", capturedMessage);

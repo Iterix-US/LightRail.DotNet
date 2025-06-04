@@ -4,6 +4,7 @@ using NSubstitute;
 using SeroGlint.DotNet.Extensions;
 using SeroGlint.DotNet.NamedPipes.Packaging;
 using SeroGlint.DotNet.Tests.TestObjects;
+using Shouldly;
 
 namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
 {
@@ -54,12 +55,20 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             // Arrange
             var logger = Substitute.For<ILogger>();
             var json = "Invalid JSON";
+            var capturedMessage = string.Empty;
+            logger
+                .When(x => x.Log(
+                    LogLevel.Error,
+                    Arg.Any<EventId>(),
+                    Arg.Do<object>(state => capturedMessage = state.ToString()),
+                    Arg.Any<Exception>(),
+                    Arg.Any<Func<object, Exception, string>>()!))
+                .Do(_ => { });
 
             // Act & Assert
-            var ex = Assert.Throws<InvalidOperationException>(() =>
-                PipeEnvelope<SerializationObject>.Deserialize<SerializationObject>(json, logger));
-            Assert.Equal("Failed to deserialize message.", ex.Message);
-            logger.Received().LogWarning("Content submitted for deserialization is not a valid json package");
+            var response = PipeEnvelope<SerializationObject>.Deserialize<SerializationObject>(json, logger);
+            response.ShouldNotBeNull();
+            capturedMessage.ShouldBeEquivalentTo("Failed to deserialize message.");
         }
     }
 }

@@ -16,7 +16,7 @@ namespace SeroGlint.DotNet.NamedPipes.Packaging
     {
         public virtual ILogger Logger { get; set; }
         public virtual string Id { get; set; } = Guid.NewGuid().ToString("N");
-        public virtual string ServerName { get; private set; } = $"{GetName()}-PipeServer";
+        public virtual string ServerName { get; private set; } = ".";
         public virtual string PipeName { get; private set; } = $"{GetName()}-Pipe";
         public virtual bool UseEncryption { get; set; } = true;
         public virtual IEncryptionService EncryptionService { get; private set; }
