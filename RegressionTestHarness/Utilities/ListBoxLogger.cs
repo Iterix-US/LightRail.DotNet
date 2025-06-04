@@ -25,7 +25,7 @@ public class ListBoxLogger(string category, Action<string> logAction) : ILogger
         logAction(message);
     }
 
-    internal static ILogger RouteLoggerToListBox(Dispatcher dispatcher, ListBox targetListBox, string category)
+    internal static ILogger? RouteLoggerToListBox(Dispatcher dispatcher, ListBox targetListBox, string category)
     {
         var coreLogger = new LoggerFactoryBuilder()
             .EnableConsoleOutput()

@@ -153,10 +153,16 @@ namespace SeroGlint.DotNet.NamedPipes.Servers
         }
 
         [ExcludeFromCodeCoverage]
-        public void Dispose() =>
-            Configuration.Logger.LogInformation($"Server disposed [{Configuration.ServerName} -> {Configuration.PipeName}]");
+        public void Dispose()
+        {
+            Configuration.CancellationTokenSource?.Cancel();
+            MessageReceived = null;
+            ResponseRequested = null;
+            Configuration.Logger.LogInformation(
+                $"Server disposed [{Configuration.ServerName} -> {Configuration.PipeName}]");
+        }
 
-        public static async Task SendResponseAsync(
+        private static async Task SendResponseAsync(
             PipeEnvelope<dynamic> response,
             NamedPipeServerStream stream,
             IEncryptionService encryptionService = null)
