@@ -43,6 +43,8 @@ namespace SeroGlint.DotNet.NamedPipes
             {
                 await Start();
             }
+            Configuration.Logger.LogInformation("Waiting for connection on pipe '{PipeName}'...", Configuration.PipeName);
+            Configuration.Logger.LogInformation("Waiting for messages on pipe '{PipeName}'...", Configuration.PipeName);
         }
 
         private async Task Start()
@@ -69,12 +71,10 @@ namespace SeroGlint.DotNet.NamedPipes
         {
             try
             {
-                Configuration.Logger.LogInformation("Waiting for connection on pipe '{PipeName}'...", Configuration.PipeName);
                 await _pipeServerStreamWrapper.WaitForConnectionAsync(Configuration.CancellationTokenSource.Token);
                 Configuration.Logger.LogInformation("Client connected on '{PipeName}'", Configuration.PipeName);
 
                 var buffer = new byte[4096];
-                Configuration.Logger.LogInformation("Waiting for messages on pipe '{PipeName}'...", Configuration.PipeName);
                 var bytesRead = await _pipeServerStreamWrapper.ReadAsync(buffer, 0, buffer.Length, Configuration.CancellationTokenSource.Token);
                 await HandleMessage<dynamic>(bytesRead, buffer);
             }

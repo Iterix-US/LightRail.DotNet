@@ -15,7 +15,7 @@ namespace SeroGlint.DotNet.NamedPipes
     public class NamedPipeClient : INamedPipeClient
     {
         private readonly ILogger _logger;
-        private readonly IPipeClientStreamWrapper _pipeClientStreamWrapper;
+        private IPipeClientStreamWrapper _pipeClientStreamWrapper;
 
         internal INamedPipeConfiguration Configuration { get; }
 
@@ -87,9 +87,9 @@ namespace SeroGlint.DotNet.NamedPipes
         {
             var buffer = new byte[4096];
             var bytesRead = await client.ReadAsync(
-                buffer, 
-                0, 
-                buffer.Length, 
+                buffer,
+                0,
+                buffer.Length,
                 Configuration.CancellationTokenSource.Token);
             var responseBytes = new byte[bytesRead];
 
@@ -121,7 +121,7 @@ namespace SeroGlint.DotNet.NamedPipes
         private byte[] PrepareMessage<T>(IPipeEnvelope<T> message)
         {
             var serializedEnvelope = message.Serialize();
-            
+
             if (!Configuration.UseEncryption)
             {
                 return serializedEnvelope;
@@ -135,15 +135,19 @@ namespace SeroGlint.DotNet.NamedPipes
 
         private IPipeClientStreamWrapper EstablishClientStream()
         {
-            var clientStream = new NamedPipeClientStream(
-                Configuration.ServerName,
-                Configuration.PipeName,
-                PipeDirection.InOut,
-                PipeOptions.Asynchronous);
+            if (_pipeClientStreamWrapper == null)
+            {
+                var clientStream = new NamedPipeClientStream(
+                    Configuration.ServerName,
+                    Configuration.PipeName,
+                    PipeDirection.InOut,
+                    PipeOptions.Asynchronous);
 
-            var client = _pipeClientStreamWrapper ?? new PipeClientStreamWrapper(clientStream);
+                _pipeClientStreamWrapper = new PipeClientStreamWrapper(clientStream);
+            }
+
             _logger.LogInformation($"Using client (server name: {Configuration.ServerName}) and pipe '{Configuration.PipeName}'");
-            return client;
+            return _pipeClientStreamWrapper;
         }
 
         internal bool ValidateMessageSettings<T>(string serverName, string pipeName, IPipeEnvelope<T> messageContent)
