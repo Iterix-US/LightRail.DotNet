@@ -1,15 +1,13 @@
-using System;
 using System.Text;
 using SeroGlint.DotNet.SecurityUtilities;
 using Shouldly;
-using Xunit;
 
-namespace SeroGlint.DotNet.Tests
+namespace SeroGlint.DotNet.Tests.TestClasses.Security
 {
     public class PasswordUtilityTests
     {
         [Fact]
-        public void HashPassword_ShouldReturnDifferentHashes_ForSamePassword()
+        public void PasswordUtility_WhenHashingSamePasswordMultipleTimes_ThenHashesShouldDiffer()
         {
             // Arrange
             var password = "MySecurePassword";
@@ -19,11 +17,11 @@ namespace SeroGlint.DotNet.Tests
             var hash2 = PasswordUtility.HashPassword(password);
 
             // Assert
-            hash1.ShouldNotBe(hash2); // Different salt should make them unique
+            hash1.ShouldNotBe(hash2);
         }
 
         [Fact]
-        public void VerifyPassword_ShouldReturnTrue_ForCorrectPassword()
+        public void PasswordUtility_WhenVerifyingCorrectPassword_ThenReturnsTrue()
         {
             var password = "CorrectHorseBatteryStaple";
             var hash = PasswordUtility.HashPassword(password);
@@ -34,7 +32,7 @@ namespace SeroGlint.DotNet.Tests
         }
 
         [Fact]
-        public void VerifyPassword_ShouldReturnFalse_ForIncorrectPassword()
+        public void PasswordUtility_WhenVerifyingIncorrectPassword_ThenReturnsFalse()
         {
             var correct = "Secure123!";
             var wrong = "Insecure123!";
@@ -46,7 +44,7 @@ namespace SeroGlint.DotNet.Tests
         }
 
         [Fact]
-        public void VerifyPassword_ShouldReturnFalse_ForTamperedHash()
+        public void PasswordUtility_WhenVerifyingTamperedHash_ThenReturnsFalse()
         {
             var password = "DoNotTamper";
             var hash = PasswordUtility.HashPassword(password);
@@ -61,7 +59,7 @@ namespace SeroGlint.DotNet.Tests
         }
 
         [Fact]
-        public void VerifyPassword_ShouldReturnFalse_ForMalformedHash()
+        public void PasswordUtility_WhenVerifyingMalformedHash_ThenReturnsFalse()
         {
             var malformed = "PBKDF2-SHA256:100000:this-is-not-base64";
 
@@ -71,7 +69,7 @@ namespace SeroGlint.DotNet.Tests
         }
 
         [Fact]
-        public void VerifyPassword_ShouldReturnFalse_ForWrongAlgorithm()
+        public void PasswordUtility_WhenHashUsesUnsupportedAlgorithm_ThenReturnsFalse()
         {
             var hash = PasswordUtility.HashPassword("mypassword");
             var parts = hash.Split(':');
@@ -82,19 +80,19 @@ namespace SeroGlint.DotNet.Tests
         }
 
         [Fact]
-        public void HashPassword_ShouldNormalizeUnicode()
+        public void PasswordUtility_WhenHashingUnicodeEquivalents_ThenVerificationSucceeds()
         {
-            var composed = "ﬁ";             // U+FB01 (ligature)
-            var decomposed = "f\u0069";     // 'f' + 'i'
+            var composed = "ﬁ";
+            var decomposed = "f\u0069";
 
             var hash = PasswordUtility.HashPassword(composed);
             var result = PasswordUtility.VerifyPassword(decomposed, hash);
 
-            result.ShouldBeTrue(); // Because both normalize to same string
+            result.ShouldBeTrue();
         }
 
         [Fact]
-        public void FixedTimeEquals_ShouldReturnTrue_WhenArraysMatch()
+        public void PasswordUtility_WhenFixedTimeEqualsReceivesMatchingArrays_ThenReturnsTrue()
         {
             var a = new byte[] { 0xAA, 0xBB, 0xCC };
             var b = new byte[] { 0xAA, 0xBB, 0xCC };
@@ -103,7 +101,7 @@ namespace SeroGlint.DotNet.Tests
         }
 
         [Fact]
-        public void FixedTimeEquals_ShouldReturnFalse_WhenArraysAreDifferent()
+        public void PasswordUtility_WhenFixedTimeEqualsReceivesMismatchedArrays_ThenReturnsFalse()
         {
             var a = new byte[] { 0xAA, 0xBB, 0xCC };
             var b = new byte[] { 0xAA, 0xBB, 0xCD };
@@ -112,7 +110,7 @@ namespace SeroGlint.DotNet.Tests
         }
 
         [Fact]
-        public void FixedTimeEquals_ShouldReturnFalse_WhenLengthsDiffer()
+        public void PasswordUtility_WhenFixedTimeEqualsReceivesArraysOfDifferentLengths_ThenReturnsFalse()
         {
             var a = new byte[] { 0xAA, 0xBB };
             var b = new byte[] { 0xAA, 0xBB, 0xCC };
@@ -121,7 +119,7 @@ namespace SeroGlint.DotNet.Tests
         }
 
         [Fact]
-        public void Pbkdf2HmacSha256_ShouldReturnCorrectLength()
+        public void PasswordUtility_WhenCallingPbkdf2HmacSha256_ThenReturnsExpectedByteLength()
         {
             var password = "secret";
             var salt = new byte[16];
@@ -133,7 +131,7 @@ namespace SeroGlint.DotNet.Tests
         }
 
         [Fact]
-        public void Pbkdf2HmacSha256_ShouldBeDeterministic_ForSameInputs()
+        public void PasswordUtility_WhenCallingPbkdf2HmacSha256WithSameInputs_ThenReturnsDeterministicOutput()
         {
             var password = "predictable";
             var salt = Encoding.UTF8.GetBytes("this-is-salt");
@@ -143,34 +141,34 @@ namespace SeroGlint.DotNet.Tests
 
             h1.ShouldBe(h2);
         }
-        
+
         [Fact]
-        public void VerifyPassword_ShouldReturnFalse_WhenSaltIsInvalidBase64()
+        public void PasswordUtility_WhenSaltIsInvalidBase64_ThenVerifyReturnsFalse()
         {
             // Arrange
-            var invalidSalt = "!!!!"; // invalid base64
+            var invalidSalt = "!!!!";
             var hash = $"PBKDF2-SHA256:100000:{invalidSalt}:aGVsbG93b3JsZA==";
 
             // Act
             var result = PasswordUtility.VerifyPassword("test", hash);
 
             // Assert
-            result.ShouldBeFalse(); // Should hit the catch block
+            result.ShouldBeFalse();
         }
 
         [Fact]
-        public void VerifyPassword_ShouldReturnFalse_WhenHashIsInvalidBase64()
+        public void PasswordUtility_WhenHashIsInvalidBase64_ThenVerifyReturnsFalse()
         {
             // Arrange
-            var salt = Convert.ToBase64String(Encoding.UTF8.GetBytes("salt123"));
-            var invalidHash = "%%%"; // not valid base64
+            var salt = Convert.ToBase64String("salt123"u8.ToArray());
+            var invalidHash = "%%%";
             var hash = $"PBKDF2-SHA256:100000:{salt}:{invalidHash}";
 
             // Act
             var result = PasswordUtility.VerifyPassword("test", hash);
 
             // Assert
-            result.ShouldBeFalse(); // Will trigger exception and hit catch
+            result.ShouldBeFalse();
         }
     }
 }
