@@ -1,8 +1,9 @@
-﻿using System;
+﻿using SeroGlint.DotNet.NamedPipes.Packaging;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Pipes;
 
-namespace SeroGlint.DotNet.NamedPipes.Packaging
+namespace SeroGlint.DotNet.NamedPipes.EventArguments
 {
     [ExcludeFromCodeCoverage]
     public class PipeResponseRequestedEventArgs : EventArgs

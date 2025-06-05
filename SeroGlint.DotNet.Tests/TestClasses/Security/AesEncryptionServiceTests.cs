@@ -8,7 +8,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.Security
     public class AesEncryptionServiceTests
     {
         [Fact]
-        public void EncryptDecrypt_RoundTrip_ShouldMatchOriginal()
+        public void AesEncryptionService_WhenEncryptingAndDecrypting_ThenReturnsOriginalPlaintext()
         {
             // Arrange
             var logger = Substitute.For<ILogger>();
@@ -27,7 +27,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.Security
         }
 
         [Fact]
-        public void Constructor_InvalidKeyLength_ShouldThrow()
+        public void AesEncryptionService_WhenInitializedWithInvalidKeyLength_ThenThrowsArgumentException()
         {
             var logger = Substitute.For<ILogger>();
             var invalidKey = Convert.ToBase64String("TooShortKey"u8.ToArray());
@@ -36,7 +36,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.Security
         }
 
         [Fact]
-        public void Encrypt_NullData_ShouldThrow()
+        public void AesEncryptionService_WhenEncryptingNullData_ThenThrowsArgumentException()
         {
             var logger = Substitute.For<ILogger>();
             var key = Convert.ToBase64String("12345678901234567890123456789012"u8.ToArray()); // 32-byte key
@@ -46,7 +46,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.Security
         }
 
         [Fact]
-        public void Decrypt_EmptyData_ShouldThrow()
+        public void AesEncryptionService_WhenDecryptingEmptyArray_ThenThrowsArgumentException()
         {
             var logger = Substitute.For<ILogger>();
             var key = Convert.ToBase64String("12345678901234567890123456789012"u8.ToArray()); // 32-byte key
@@ -56,7 +56,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.Security
         }
 
         [Fact]
-        public void GenerateKey_ShouldReturnValidBase64Encoded32ByteKey()
+        public void AesEncryptionService_WhenGeneratingKey_ThenReturnsValidBase64Encoded32ByteKey()
         {
             // Act
             var key = AesEncryptionService.GenerateKey();

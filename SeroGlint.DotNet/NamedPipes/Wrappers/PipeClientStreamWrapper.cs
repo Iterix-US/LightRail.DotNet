@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces;
 
-namespace SeroGlint.DotNet.NamedPipes
+namespace SeroGlint.DotNet.NamedPipes.Wrappers
 {
     [ExcludeFromCodeCoverage] // No need to test a wrapper pass-through
     public class PipeClientStreamWrapper : IPipeClientStreamWrapper

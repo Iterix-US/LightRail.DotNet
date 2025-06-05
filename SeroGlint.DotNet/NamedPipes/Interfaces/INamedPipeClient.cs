@@ -13,6 +13,6 @@ namespace SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces
         /// <typeparam name="T"></typeparam>
         /// <param name="pipeEnvelope"></param>
         /// <returns></returns>
-        Task<string> Send<T>(IPipeEnvelope<T> pipeEnvelope);
+        Task<string> SendAsync<T>(IPipeEnvelope<T> pipeEnvelope);
     }
 }

@@ -1,8 +1,10 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Text;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using SeroGlint.DotNet.NamedPipes;
 using SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces;
 using SeroGlint.DotNet.NamedPipes.Packaging;
+using SeroGlint.DotNet.SecurityUtilities;
 using SeroGlint.DotNet.SecurityUtilities.SecurityInterfaces;
 using SeroGlint.DotNet.Tests.TestClasses.NamedPipes.TestObjects;
 using SeroGlint.DotNet.Tests.TestObjects;
@@ -18,10 +20,10 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
         private readonly ILogger _logger = Substitute.For<ILogger>();
 
         [Fact]
-        public async Task SendMessage_ShouldLogError_WhenServerNameIsNull()
+        public async Task NamedPipeClient_WhenServerNameIsNull_ThenLogsValidationError()
         {
             // Arrange
-            var config = Substitute.For<INamedPipeConfigurator>();
+            var config = Substitute.For<INamedPipeConfiguration>();
             config.ServerName.Returns((string)null!);
             config.PipeName.Returns("PipeName");
             config.CancellationTokenSource.Returns(new CancellationTokenSource(3000));
@@ -32,10 +34,10 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             _logger
                 .When(x => x.Log(
                     LogLevel.Error,
-                    Arg.Any<EventId>(),
-                    Arg.Do<object>(state => capturedMessage = state.ToString()),
-                    Arg.Any<Exception>(),
-                    Arg.Any<Func<object, Exception, string>>()!))
+                    Any<EventId>(),
+                    Do<object>(state => capturedMessage = state.ToString()),
+                    Any<Exception>(),
+                    Any<Func<object, Exception, string>>()!))
                 .Do(_ => { });
 
             var envelope = new PipeEnvelope<SerializationObject>(_logger)
@@ -50,17 +52,17 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             var client = new NamedPipeClient(config, _logger);
 
             // Act
-            await client.Send(envelope);
+            await client.SendAsync(envelope);
 
             // Assert
             Assert.Contains("Server name cannot be null or whitespace", capturedMessage);
         }
 
         [Fact]
-        public async Task SendMessage_ShouldLogError_WhenPipeNameIsEmpty()
+        public async Task NamedPipeClient_WhenPipeNameIsEmpty_ThenLogsValidationError()
         {
             // Arrange
-            var config = Substitute.For<INamedPipeConfigurator>();
+            var config = Substitute.For<INamedPipeConfiguration>();
             config.ServerName.Returns("ValidServer");
             config.PipeName.Returns(""); // Invalid pipe name
             config.CancellationTokenSource.Returns(new CancellationTokenSource(3000));
@@ -70,10 +72,10 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             _logger
                 .When(x => x.Log(
                     LogLevel.Error,
-                    Arg.Any<EventId>(),
-                    Arg.Do<object>(state => capturedMessage = state.ToString()),
-                    Arg.Any<Exception>(),
-                    Arg.Any<Func<object, Exception, string>>()!))
+                    Any<EventId>(),
+                    Do<object>(state => capturedMessage = state.ToString()),
+                    Any<Exception>(),
+                    Any<Func<object, Exception, string>>()!))
                 .Do(_ => { });
 
             var envelope = new PipeEnvelope<SerializationObject>(_logger)
@@ -84,20 +86,18 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             var client = new NamedPipeClient(config, _logger);
 
             // Act
-            await client.Send(envelope);
+            await client.SendAsync(envelope);
 
             // Assert
-            Assert.Contains("Pipe name cannot be null or whitespace", capturedMessage);
+            capturedMessage.ShouldContain("Pipe name cannot be null or whitespace");
         }
 
-
         [Fact]
-        public async Task SendWithTimeout_ShouldThrowWrappedException_WhenWriteFails()
+        public async Task NamedPipeClient_WhenWriteFails_ThenReturnsWrappedErrorResponse()
         {
             // Arrange
             var logger = Substitute.For<ILogger>();
-            var config = Substitute.For<INamedPipeConfigurator>();
-            var pipeWrapper = Substitute.For<IPipeClientStreamWrapper>();
+            var config = Substitute.For<INamedPipeConfiguration>();
             var envelope = Substitute.For<IPipeEnvelope<SerializationObject>>();
 
             var payload = new SerializationObject { Id = 1, Name = "Failure" };
@@ -110,23 +110,20 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             config.UseEncryption.Returns(false);
             config.EncryptionService.Returns(Substitute.For<IEncryptionService>());
 
-            pipeWrapper
-                .When(x => x.WriteAsync(Arg.Any<byte[]>(), 0, 4, Arg.Any<CancellationToken>()))
-                .Do(_ => throw new IOException("Simulated write failure"));
-
-            var client = new TestableNamedPipeClient(config, logger, pipeWrapper);
+            var client = new NamedPipeClient(config, logger);
 
             // Act & Assert
-            var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => client.Send(envelope));
-            Assert.Contains("Failed to send message to pipe", ex.Message);
+            var response = await client.SendAsync(envelope);
+            response.ShouldNotContain("Message sent");
+            response.ShouldContain("Error");
         }
 
 
         [Fact]
-        public async Task SendMessage_ShouldSerializeAndSendUnencryptedMessage()
+        public async Task NamedPipeClient_WhenSendingUnencryptedMessage_ThenSerializesAndLogsResponse()
         {
             // Arrange
-            var config = Substitute.For<INamedPipeConfigurator>();
+            var config = Substitute.For<INamedPipeConfiguration>();
             config.CancellationTokenSource.Returns(new CancellationTokenSource(3000));
 
             var envelope = new PipeEnvelope<SerializationObject>(_logger)
@@ -147,25 +144,25 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             _logger
                 .When(x => x.Log(
                     LogLevel.Information,
-                    Arg.Any<EventId>(),
-                    Arg.Do<object>(state => capturedMessage = state.ToString()),
-                    Arg.Any<Exception>(),
-                    Arg.Any<Func<object, Exception, string>>()!))
+                    Any<EventId>(),
+                    Do<object>(state => capturedMessage = state.ToString()),
+                    Any<Exception>(),
+                    Any<Func<object, Exception, string>>()!))
                 .Do(_ => { });
 
             var serverTask = TestNamedPipeServer.StartTestServerAsync(config.PipeName, config.CancellationTokenSource.Token);
             var client = new NamedPipeClient(config, _logger);
 
             // Act & Assert
-            await client.Send(envelope);
+            await client.SendAsync(envelope);
             capturedMessage.ShouldContain("received response from server");
             await serverTask;
         }
 
         [Fact]
-        public async Task SendMessage_ShouldEncryptMessage_WhenEncryptionEnabled()
+        public async Task NamedPipeClient_WhenEncryptionIsEnabled_ThenEncryptsMessageAndLogs()
         {
-            var config = Substitute.For<INamedPipeConfigurator>();
+            var config = Substitute.For<INamedPipeConfiguration>();
             var encryption = Substitute.For<IEncryptionService>();
             encryption.Encrypt(Any<byte[]>()).Returns(call => call.Arg<byte[]>());
 
@@ -189,7 +186,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             await Task.Delay(100); // Let server start
 
             var client = new NamedPipeClient(config, _logger);
-            await client.Send(envelope);
+            await client.SendAsync(envelope);
 
             encryption.Received().Encrypt(Any<byte[]>());
             _logger.Received().LogInformation("Encrypting message before sending.");
@@ -198,12 +195,12 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
         }
 
         [Fact]
-        public async Task SendMessage_ShouldFailValidationWhenInvalidServerInformationPassedIn()
+        public async Task NamedPipeClient_WhenInvalidServerInfoProvided_ThenFailsValidationAndLogsAllErrors()
         {
             // Arrange
             var capturedMessage = string.Empty;
 
-            var config = Substitute.For<INamedPipeConfigurator>();
+            var config = Substitute.For<INamedPipeConfiguration>();
             config.CancellationTokenSource.Returns(new CancellationTokenSource(3000));
 
             var envelope = new PipeEnvelope<SerializationObject>(_logger);
@@ -216,21 +213,60 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             _logger
                 .When(x => x.Log(
                     LogLevel.Error,
-                    Arg.Any<EventId>(),
-                    Arg.Do<object>(state => capturedMessage = state.ToString()),
-                    Arg.Any<Exception>(),
-                    Arg.Any<Func<object, Exception, string>>()!))
+                    Any<EventId>(),
+                    Do<object>(state => capturedMessage = state.ToString()),
+                    Any<Exception>(),
+                    Any<Func<object, Exception, string>>()!))
                 .Do(_ => { });
 
             var client = new NamedPipeClient(config, _logger);
 
             // Act
-            await client.Send(envelope);
+            await client.SendAsync(envelope);
 
             // Assert
             Assert.Contains("Server name cannot be null or whitespace", capturedMessage);
             Assert.Contains("Pipe name cannot be null or whitespace", capturedMessage);
             Assert.Contains("Message content cannot be null or whitespace", capturedMessage);
+        }
+
+        [Fact]
+        public async Task NamedPipeClient_WhenServerResponseIsEncrypted_ThenClientDecryptsMessageSuccessfully()
+        {
+            // Arrange
+            var logger = Substitute.For<ILogger>();
+            var clientStreamWrapper = Substitute.For<IPipeClientStreamWrapper>();
+
+            var key = AesEncryptionService.GenerateKey();
+            var encServ = new AesEncryptionService(key, logger);
+            var config = new PipeServerConfiguration();
+
+            var plaintext = "This is a decrypted message.";
+            var translatedOriginalBytes = Encoding.UTF8.GetBytes(plaintext);
+            var encryptedBytes = encServ.Encrypt(translatedOriginalBytes);
+
+            config.Initialize(".", "EncryptedPipe", logger, encServ, new CancellationTokenSource(3000));
+            config.UseEncryption = true;
+
+            clientStreamWrapper.ReadAsync(
+                    Any<byte[]>(),
+                    Any<int>(),
+                    Any<int>(),
+                    Any<CancellationToken>())
+                .Returns(call =>
+                {
+                    var buffer = call.Arg<byte[]>();
+                    Buffer.BlockCopy(encryptedBytes, 0, buffer, 0, encryptedBytes.Length);
+                    return Task.FromResult(encryptedBytes.Length);
+                });
+
+            var client = new TestableNamedPipeClient(config, logger, clientStreamWrapper);
+
+            // Act
+            var result = await client.RetrieveResponse(clientStreamWrapper);
+
+            // Assert
+            result.ShouldBe(Encoding.UTF8.GetString(translatedOriginalBytes));
         }
     }
 }

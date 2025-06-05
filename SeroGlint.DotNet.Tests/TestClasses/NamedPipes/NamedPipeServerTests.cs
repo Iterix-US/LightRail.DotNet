@@ -3,8 +3,9 @@ using System.Text;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using SeroGlint.DotNet.Extensions;
+using SeroGlint.DotNet.NamedPipes;
+using SeroGlint.DotNet.NamedPipes.Interfaces;
 using SeroGlint.DotNet.NamedPipes.Packaging;
-using SeroGlint.DotNet.NamedPipes.Servers;
 using SeroGlint.DotNet.SecurityUtilities.SecurityInterfaces;
 using SeroGlint.DotNet.Tests.TestObjects;
 using Shouldly;
@@ -22,7 +23,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
         }
 
         [Fact]
-        public async Task StartAsync_ShouldTriggerMessageReceived()
+        public async Task NamedPipeServer_WhenMessageIsReceived_ThenTriggersMessageReceivedEvent()
         {
             var logger = Substitute.For<ILogger>();
             var encryptionService = Substitute.For<IEncryptionService>();
@@ -56,7 +57,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
         }
 
         [Fact]
-        public async Task StartAsync_ShouldCatchGeneralException()
+        public async Task NamedPipeServer_WhenInitializationFails_ThenLogsGeneralException()
         {
             // Arrange
             var logger = Substitute.For<ILogger>();
@@ -85,7 +86,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
         }
 
         [Fact]
-        public async Task StartAsync_ShouldLogAndDieGracefully_WhenHandleMessageFails()
+        public async Task NamedPipeServer_WhenMessageDeserializationFails_ThenLogsAndContinuesGracefully()
         {
             // Arrange
             var logger = Substitute.For<ILogger>();
@@ -138,7 +139,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
         }
 
         [Fact]
-        public async Task HandlePipeStream_ShouldExitNormally_WhenValidMessageReceived()
+        public async Task NamedPipeServer_WhenValidMessageReceived_ThenExitsNormally()
         {
             var logger = Substitute.For<ILogger>();
             var encryptionService = Substitute.For<IEncryptionService>();
@@ -178,6 +179,71 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             await serverTask;
 
             Assert.True(messageReceived);
+        }
+
+        [Fact]
+        public async Task NamedPipeServer_WhenSendResponseAsyncGivenNullStream_ThenReturnsWithoutWriting()
+        {
+            // Arrange
+            var envelope = new PipeEnvelope<dynamic> { Payload = "No-op" };
+
+            // Act
+            var namedPipeServer = new NamedPipeServer(new PipeServerConfiguration());
+            var exception = await Record.ExceptionAsync(() =>
+                namedPipeServer.SendResponseAsync(envelope));
+
+            // Assert
+            exception.ShouldBeNull();
+        }
+
+        [Fact]
+        public async Task NamedPipeServer_WhenSendResponseAsyncGivenDisconnectedStream_ThenReturnsWithoutWriting()
+        {
+            // Arrange
+            var namedPipeServer = new NamedPipeServer(new PipeServerConfiguration());
+            var stream = Substitute.For<IPipeServerStreamWrapper>();
+            stream.IsConnected.Returns(false);
+
+            var envelope = new PipeEnvelope<dynamic> { Payload = "Ignored" };
+
+            // Act
+            var exception = await Record.ExceptionAsync(() =>
+                namedPipeServer.SendResponseAsync(envelope));
+
+            // Assert
+            exception.ShouldBeNull();
+        }
+
+        [Fact]
+        public async Task NamedPipeServer_WhenHandleMessageGivenZeroBytesRead_ThenLogsAndExitsEarly()
+        {
+            // Arrange
+            var logger = Substitute.For<ILogger>();
+            var encryptionService = Substitute.For<IEncryptionService>();
+            var pipeName = $"TestPipe_{Guid.NewGuid():N}";
+
+            var config = new PipeServerConfiguration();
+            config.Initialize(".", pipeName, logger, encryptionService, new CancellationTokenSource());
+
+            var buffer = new byte[4096];
+            var pipeStream = Substitute.For<IPipeServerStreamWrapper>();
+            var server = new NamedPipeServer(config, pipeStream);
+
+            var captured = string.Empty;
+            logger
+                .When(x => x.Log(
+                    LogLevel.Information,
+                    Arg.Any<EventId>(),
+                    Arg.Do<object>(state => captured = state.ToString()),
+                    Arg.Any<Exception>(),
+                    Arg.Any<Func<object, Exception, string>>()!))
+                .Do(_ => { });
+
+            // Act
+            await server.HandleMessage<dynamic>(0, buffer);
+
+            // Assert
+            captured.ShouldContain("No bytes read from pipe");
         }
 
         private async Task CleanupServer(PipeServerConfiguration config, Task serverTask)

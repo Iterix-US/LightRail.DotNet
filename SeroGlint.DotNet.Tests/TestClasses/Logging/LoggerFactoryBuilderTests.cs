@@ -37,7 +37,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.Logging
         }
 
         [Fact]
-        public void BuildSerilog_CreatesLogger_WithFileAndConsole()
+        public void LoggerFactoryBuilder_WhenBuildingSerilogWithFileAndConsole_ThenCreatesLogFileWithMessage()
         {
             var builder = new LoggerFactoryBuilder()
                 .EnableConsoleOutput()
@@ -64,7 +64,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.Logging
         }
 
         [Fact]
-        public void BuildNLog_CreatesLogger_WithFileAndConsole()
+        public void LoggerFactoryBuilder_WhenBuildingNLogWithFileAndConsole_ThenCreatesLogFileWithMessage()
         {
             // Arrange
             var builder = new LoggerFactoryBuilder()
@@ -91,7 +91,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.Logging
         }
 
         [Fact]
-        public void BuildSerilog_WithConfiguration_UsesConfigSettings()
+        public void LoggerFactoryBuilder_WhenBuildingSerilogWithConfiguration_ThenUsesProvidedSettings()
         {
             var configBuilder = new ConfigurationBuilder()
                 .AddInMemoryCollection([
@@ -111,7 +111,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.Logging
         }
 
         [Fact]
-        public void BuildNLog_WithConfiguration_UsesConfigSettings()
+        public void LoggerFactoryBuilder_WhenBuildingNLogWithConfiguration_ThenUsesProvidedSettings()
         {
             var configBuilder = new ConfigurationBuilder()
                 .AddInMemoryCollection([
@@ -134,7 +134,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.Logging
         }
 
         [Fact]
-        public void FileManager_Property_ReturnsInjectedInstance()
+        public void LoggerFactoryBuilder_WhenCreatedWithCustomFileManager_ThenFileManagerPropertyReturnsIt()
         {
             // Arrange
             var mockManager = Substitute.For<IDirectoryManagement>();

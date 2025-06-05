@@ -5,8 +5,8 @@ using RegressionTestHarness.Utilities;
 using SeroGlint.DotNet.Extensions;
 using SeroGlint.DotNet.NamedPipes;
 using SeroGlint.DotNet.NamedPipes.Packaging;
-using SeroGlint.DotNet.NamedPipes.Servers;
 using SeroGlint.DotNet.SecurityUtilities;
+using SeroGlint.DotNet.NamedPipes.EventArguments;
 
 namespace RegressionTestHarness.Pages
 {
@@ -62,7 +62,7 @@ namespace RegressionTestHarness.Pages
 
         private async void btnStartServer_Click(object sender, RoutedEventArgs e)
         {
-            await _namedPipeServer?.StartAsync()!;
+            await Task.Run(() => _namedPipeServer?.StartAsync()!);
         }
 
         private void btnStopServer_Click(object sender, RoutedEventArgs e)
@@ -78,7 +78,7 @@ namespace RegressionTestHarness.Pages
             };
 
             var client = new NamedPipeClient(_configuration, _clientLogger);
-            await client.Send(envelope);
+            await client.SendAsync(envelope);
         }
 
         private void btnClearServerLog_Click(object sender, RoutedEventArgs e)
@@ -98,13 +98,14 @@ namespace RegressionTestHarness.Pages
 
         private Task NamedPipeServerResponseRequested(object sender, PipeResponseRequestedEventArgs args)
         {
-            LstServerLog
-                .Items
-                .Add(
+            Dispatcher.Invoke(() =>
+            {
+                LstServerLog.Items.Add(
                     $"FROM PIPE SERVER- Response requested for message ID " +
                     $"{args.ResponseObject.MessageId}: " +
                     $"{args.ResponseObject.ToJson()}"
                 );
+            });
 
             return Task.CompletedTask;
         }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SeroGlint.DotNet.Extensions;
 using SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces;
+using SeroGlint.DotNet.NamedPipes.Wrappers;
 
 namespace SeroGlint.DotNet.NamedPipes
 {
@@ -16,9 +17,9 @@ namespace SeroGlint.DotNet.NamedPipes
         private readonly ILogger _logger;
         private readonly IPipeClientStreamWrapper _pipeClientStreamWrapper;
 
-        internal INamedPipeConfigurator Configuration { get; }
+        internal INamedPipeConfiguration Configuration { get; }
 
-        public NamedPipeClient(INamedPipeConfigurator configuration, ILogger logger,
+        public NamedPipeClient(INamedPipeConfiguration configuration, ILogger logger,
             IPipeClientStreamWrapper pipeClientStreamWrapper = null)
         {
             _logger = logger;
@@ -32,7 +33,7 @@ namespace SeroGlint.DotNet.NamedPipes
         /// <typeparam name="T"></typeparam>
         /// <param name="message"></param>
         /// <returns></returns>
-        public virtual async Task<string> Send<T>(IPipeEnvelope<T> message)
+        public virtual async Task<string> SendAsync<T>(IPipeEnvelope<T> message)
         {
             if (!ValidateMessageSettings(Configuration.ServerName, Configuration.PipeName, message))
             {
@@ -45,12 +46,7 @@ namespace SeroGlint.DotNet.NamedPipes
             using (client)
             {
                 var sendResult = await SendThroughPipe(client, serializedEnvelope);
-
-                if (sendResult.IsNullOrWhitespace())
-                {
-                    return sendResult;
-                }
-
+                _logger.LogInformation(sendResult);
                 return await ParseResponse(client);
             }
         }
@@ -59,12 +55,11 @@ namespace SeroGlint.DotNet.NamedPipes
         {
             try
             {
-                var responseBytes = await RetrieveResponse(client);
-                var responseJson = Encoding.UTF8.GetString(responseBytes);
+                var response = await RetrieveResponse(client);
 
                 _logger.LogInformation(
                     $"Client ({client.Id}) received response from server ({Configuration.ServerName}) on pipe ({Configuration.PipeName})");
-                return responseJson;
+                return response;
             }
             catch (Exception ex)
             {
@@ -88,16 +83,20 @@ namespace SeroGlint.DotNet.NamedPipes
             }
         }
 
-        private async Task<byte[]> RetrieveResponse(IPipeClientStreamWrapper client)
+        internal async Task<string> RetrieveResponse(IPipeClientStreamWrapper client)
         {
             var buffer = new byte[4096];
-            var bytesRead = await client.ClientStream.ReadAsync(buffer, 0, buffer.Length, Configuration.CancellationTokenSource.Token);
+            var bytesRead = await client.ReadAsync(
+                buffer, 
+                0, 
+                buffer.Length, 
+                Configuration.CancellationTokenSource.Token);
             var responseBytes = new byte[bytesRead];
 
             if (bytesRead <= 0)
             {
                 _logger.LogWarning($"No response received from server on pipe {Configuration.PipeName}");
-                return responseBytes;
+                return Encoding.UTF8.GetString(responseBytes);
             }
 
             Array.Copy(buffer, responseBytes, bytesRead);
@@ -107,7 +106,7 @@ namespace SeroGlint.DotNet.NamedPipes
                 responseBytes = Configuration.EncryptionService.Decrypt(responseBytes);
             }
 
-            return responseBytes;
+            return Encoding.UTF8.GetString(responseBytes);
         }
 
         private async Task WriteToStream(IPipeClientStreamWrapper client, byte[] serializedEnvelope)
@@ -134,22 +133,16 @@ namespace SeroGlint.DotNet.NamedPipes
             return serializedEnvelope;
         }
 
-        private PipeClientStreamWrapper EstablishClientStream()
+        private IPipeClientStreamWrapper EstablishClientStream()
         {
-            if (_pipeClientStreamWrapper != null)
-            {
-                _logger.LogInformation("Using provided PipeClientStreamWrapper.");
-                return _pipeClientStreamWrapper as PipeClientStreamWrapper;
-            }
-
             var clientStream = new NamedPipeClientStream(
                 Configuration.ServerName,
                 Configuration.PipeName,
                 PipeDirection.InOut,
                 PipeOptions.Asynchronous);
 
-            var client = new PipeClientStreamWrapper(clientStream);
-            _logger.LogInformation($"Created new NamedPipeClientStream for server '{Configuration.ServerName}' and pipe '{Configuration.PipeName}'");
+            var client = _pipeClientStreamWrapper ?? new PipeClientStreamWrapper(clientStream);
+            _logger.LogInformation($"Using client (server name: {Configuration.ServerName}) and pipe '{Configuration.PipeName}'");
             return client;
         }
 

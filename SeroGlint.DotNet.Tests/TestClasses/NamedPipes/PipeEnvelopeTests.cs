@@ -11,7 +11,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
     public class PipeEnvelopeTests
     {
         [Fact]
-        public void Serialize_ShouldReturnValidJsonBytes()
+        public void PipeEnvelope_WhenSerialized_ThenReturnsValidJsonBytes()
         {
             // Arrange
             var logger = Substitute.For<ILogger>();
@@ -29,7 +29,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
         }
 
         [Fact]
-        public void Deserialize_ShouldReturnValidEnvelope()
+        public void PipeEnvelope_WhenDeserializedWithValidJson_ThenReturnsCorrectObject()
         {
             // Arrange
             var logger = Substitute.For<ILogger>();
@@ -50,7 +50,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
         }
 
         [Fact]
-        public void Deserialize_ShouldLogWarningOnInvalidJson()
+        public void PipeEnvelope_WhenDeserializedWithInvalidJson_ThenLogsErrorAndReturnsNull()
         {
             // Arrange
             var logger = Substitute.For<ILogger>();
@@ -66,8 +66,9 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
                 .Do(_ => { });
 
             // Act & Assert
-            var response = PipeEnvelope<SerializationObject>.Deserialize<SerializationObject>(json, logger);
-            response.ShouldNotBeNull();
+            var response = 
+                PipeEnvelope<SerializationObject>.Deserialize<SerializationObject>(json, logger);
+            response.ShouldBeNull();
             capturedMessage.ShouldBeEquivalentTo("Failed to deserialize message.");
         }
     }

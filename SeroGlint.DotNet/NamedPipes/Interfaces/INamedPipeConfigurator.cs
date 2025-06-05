@@ -7,7 +7,7 @@ namespace SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces
     /// <summary>
     /// Interface for configuring named pipe servers, providing properties and methods for setup.
     /// </summary>
-    public interface INamedPipeConfigurator
+    public interface INamedPipeConfiguration
     {
         /// <summary>
         /// Logger for logging named pipe operations and events.

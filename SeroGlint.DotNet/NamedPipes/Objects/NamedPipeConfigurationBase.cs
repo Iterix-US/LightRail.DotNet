@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using Microsoft.Extensions.Logging;
@@ -12,7 +11,7 @@ namespace SeroGlint.DotNet.NamedPipes.Packaging
     /// Base class for configuring named pipe servers, providing default implementations and properties.
     /// </summary>
     [ExcludeFromCodeCoverage]
-    public abstract class NamedPipeConfigurationBase : INamedPipeConfigurator
+    public abstract class NamedPipeConfigurationBase : INamedPipeConfiguration
     {
         public virtual ILogger Logger { get; set; }
         public virtual string Id { get; set; } = Guid.NewGuid().ToString("N");
@@ -32,23 +31,6 @@ namespace SeroGlint.DotNet.NamedPipes.Packaging
             CancellationTokenSource cancellationTokenSource = null)
         {
             Logger = logger;
-            
-            if (string.IsNullOrWhiteSpace(serverName))
-            {
-                Logger.LogWarning("Server name cannot be null or whitespace.");
-            }
-
-            if (!Debugger.IsAttached && string.IsNullOrWhiteSpace(pipeName))
-            {
-                Logger.LogWarning("Pipe name cannot be null or whitespace.");
-            }
-
-            if (cancellationTokenSource == null)
-            {
-                Logger.LogWarning("Cancellation token source cannot be null.");
-                return;
-            }
-
             ServerName = serverName ?? ServerName;
             PipeName = pipeName ?? PipeName;
             EncryptionService = encryptionService ?? EncryptionService;
