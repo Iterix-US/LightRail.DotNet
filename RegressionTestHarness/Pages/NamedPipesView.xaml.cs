@@ -96,6 +96,8 @@ namespace RegressionTestHarness.Pages
             _serverConfiguration?.Reset();
         }
 
+        // TODO: Add a client disconnect button/logic to break the connection with the server.
+
         private async void btnSendTestMessage_Click(object sender, RoutedEventArgs e)
         {
             var envelope = new PipeEnvelope<TestObject>(_clientLogger)
