@@ -114,12 +114,18 @@ namespace SeroGlint.DotNet.NamedPipes
         {
             try
             {
-                await client.ConnectAsync(Configuration.CancellationTokenSource.Token);
+                if (!client.IsConnected)
+                {
+                    await client.ConnectAsync(Configuration.CancellationTokenSource.Token);
+                }
+
                 _logger.LogInformation(
-                    $"Connected to pipe {Configuration.PipeName} on server {Configuration.ServerName}");
+                    $"Connected to pipe {Configuration.PipeName} on server {Configuration.ServerName}"
+                );
 
                 await client.WriteAsync(serializedEnvelope, 0, serializedEnvelope.Length,
                     Configuration.CancellationTokenSource.Token);
+
                 await client.FlushAsync(Configuration.CancellationTokenSource.Token);
             }
             catch (Exception ex)

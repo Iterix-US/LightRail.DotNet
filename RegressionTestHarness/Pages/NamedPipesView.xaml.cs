@@ -23,6 +23,7 @@ namespace RegressionTestHarness.Pages
         private AesEncryptionService? _encryptionService;
         private PipeServerConfiguration? _serverConfiguration;
         private PipeClientConfiguration? _clientConfiguration;
+        private NamedPipeClient _namedPipeClient;
 
         public NamedPipesView()
         {
@@ -30,6 +31,22 @@ namespace RegressionTestHarness.Pages
             InitializeLogger();
             InitializeServerConfiguration();
             InitializeServer();
+            InitializeClient();
+        }
+
+        private void InitializeClient()
+        {
+            if (_clientConfiguration == null)
+            {
+                _clientConfiguration = new PipeClientConfiguration();
+                _clientConfiguration.Initialize(
+                    ".",
+                    "TestPipe",
+                    _clientLogger,
+                    _encryptionService);
+            }
+
+            _namedPipeClient = new NamedPipeClient(_clientConfiguration, _clientLogger);
         }
 
         private void InitializeServerConfiguration()
@@ -38,11 +55,10 @@ namespace RegressionTestHarness.Pages
 
             _serverConfiguration = new PipeServerConfiguration();
             _serverConfiguration.Initialize(
-                null,
+                ".",
                 "TestPipe",
                 _serverLogger,
-                _encryptionService,
-                new CancellationTokenSource());
+                _encryptionService);
         }
 
         private void InitializeLogger()
@@ -72,13 +88,12 @@ namespace RegressionTestHarness.Pages
             }
 
             await _namedPipeServer!.StartAsync();
-            txtServerStatus.Text = $"Server running ({_namedPipeServer.Id})";
         }
 
         private void btnStopServer_Click(object sender, RoutedEventArgs e)
         {
             _namedPipeServer?.Stop();
-            txtServerStatus.Text = "No server running";
+            _serverConfiguration?.Reset();
         }
 
         private async void btnSendTestMessage_Click(object sender, RoutedEventArgs e)
@@ -87,22 +102,10 @@ namespace RegressionTestHarness.Pages
             {
                 Payload = new TestObject()
             };
+            
+            var response = await _namedPipeClient.SendAsync(envelope);
 
-            if (_clientConfiguration == null)
-            {
-                _clientConfiguration = new PipeClientConfiguration();
-                _clientConfiguration.Initialize(
-                    ".",
-                    "TestPipe",
-                    _clientLogger,
-                    _encryptionService,
-                    new CancellationTokenSource());
-            }
-
-            var client = new NamedPipeClient(_clientConfiguration, _clientLogger);
-            var response = await client.SendAsync(envelope);
-
-            _clientConfiguration.Logger.LogInformation($"FROM PIPE CLIENT- Message received: {response}");
+            _clientConfiguration?.Logger.LogInformation($"FROM PIPE CLIENT- Message received: {response}");
         }
 
         private void btnClearServerLog_Click(object sender, RoutedEventArgs e)
@@ -137,7 +140,7 @@ namespace RegressionTestHarness.Pages
             var logMessage = $"\n\tUI Server Log Capture- Response requested\n" +
                              $"\tMessage Id: {args.ResponseObject.MessageId}\n" +
                              $"\t{args.ResponseObject.ToJson()}";
-            
+
             _serverLogger?.LogInformation(logMessage);
 
             return Task.CompletedTask;
@@ -147,6 +150,11 @@ namespace RegressionTestHarness.Pages
         {
             var logMessage = args.GetLogMessage() ?? "Failure to change server state";
             _serverLogger?.LogInformation(logMessage);
+
+                txtServerStatus.Text =
+                    args.ContextLabel.EqualsIgnoreCase("started") ?
+                        $"Server running ({_namedPipeServer?.Id})" :
+                        "No server running";
 
             return Task.CompletedTask;
         }

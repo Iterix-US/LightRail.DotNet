@@ -36,5 +36,12 @@ namespace SeroGlint.DotNet.NamedPipes.Packaging
             EncryptionService = encryptionService ?? EncryptionService;
             CancellationTokenSource = cancellationTokenSource ?? CancellationTokenSource;
         }
+
+        public void Reset()
+        {
+            Id = Guid.NewGuid().ToString("N");
+            CancellationTokenSource?.Cancel();
+            CancellationTokenSource = new CancellationTokenSource();
+        }
     }
 }

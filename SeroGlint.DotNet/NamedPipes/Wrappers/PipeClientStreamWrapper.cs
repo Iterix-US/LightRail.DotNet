@@ -11,6 +11,7 @@ namespace SeroGlint.DotNet.NamedPipes.Wrappers
     public class PipeClientStreamWrapper : IPipeClientStreamWrapper
     {
         public Guid Id { get; } = Guid.NewGuid();
+        public bool IsConnected => ClientStream?.IsConnected ?? false;
         public NamedPipeClientStream ClientStream { get; }
 
         public PipeClientStreamWrapper(NamedPipeClientStream pipeClientStream = null)

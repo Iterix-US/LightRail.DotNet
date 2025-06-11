@@ -8,6 +8,7 @@ namespace SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces
     public interface IPipeClientStreamWrapper : IDisposable
     {
         Guid Id { get; }
+        bool IsConnected { get; }
         NamedPipeClientStream ClientStream { get; }
         Task ConnectAsync(CancellationToken token);
         Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken token);

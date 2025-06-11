@@ -190,7 +190,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             // Act
             var namedPipeServer = new NamedPipeServer(new PipeServerConfiguration());
             var exception = await Record.ExceptionAsync(() =>
-                namedPipeServer.SendResponseAsync(envelope));
+                namedPipeServer.SendResponseAsync(envelope.MessageId));
 
             // Assert
             exception.ShouldBeNull();
@@ -208,14 +208,14 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
 
             // Act
             var exception = await Record.ExceptionAsync(() =>
-                namedPipeServer.SendResponseAsync(envelope));
+                namedPipeServer.SendResponseAsync(envelope.MessageId));
 
             // Assert
             exception.ShouldBeNull();
         }
 
         [Fact]
-        public async Task NamedPipeServer_WhenHandleMessageGivenZeroBytesRead_ThenLogsAndExitsEarly()
+        public void NamedPipeServer_WhenHandleMessageGivenZeroBytesRead_ThenLogsAndExitsEarly()
         {
             // Arrange
             var logger = Substitute.For<ILogger>();
@@ -240,7 +240,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
                 .Do(_ => { });
 
             // Act
-            await server.HandleMessage<dynamic>(0, buffer);
+            server.ProcessReceivedMessage<dynamic>(0, buffer);
 
             // Assert
             captured.ShouldContain("No bytes read from pipe");
