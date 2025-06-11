@@ -19,8 +19,8 @@ namespace SeroGlint.DotNet.NamedPipes
     /// </summary>
     public class NamedPipeServer : INamedPipeServer
     {
-        public Guid Id { get; private set; }
-        public bool IsListening { get; private set; }
+        public Guid Id { get; } = Guid.NewGuid();
+        public bool IsListening => _pipeServerStreamWrapper?.IsListening ?? false;
         public PipeServerConfiguration Configuration { get; }
         private IPipeServerStreamWrapper _pipeServerStreamWrapper;
 
@@ -55,37 +55,52 @@ namespace SeroGlint.DotNet.NamedPipes
         public async Task StartAsync()
         {
             Start();
-            using (_pipeServerStreamWrapper.ServerStream)
-            {
-                NotifyServerStarted();
-
-                while (!Configuration.CancellationTokenSource.IsCancellationRequested)
-                {
-                    await HandlePipeStream();
-                }
-            }
+            NotifyServerStarted();
 
             Configuration.Logger.LogInformation("Waiting for connection on pipe '{PipeName}'...", Configuration.PipeName);
-            Configuration.Logger.LogInformation("Waiting for messages on pipe '{PipeName}'...", Configuration.PipeName);
+
+            while (!Configuration.CancellationTokenSource.IsCancellationRequested)
+            {
+                await HandlePipeStream();
+            }
+
+            //if (Configuration.ServerMode == PipeServerMode.Perpetual)
+            //{
+            //    await StartAsync();
+            //}
         }
 
         private void Start()
         {
-            if (_pipeServerStreamWrapper?.IsConnected == false)
+            try
             {
-                _pipeServerStreamWrapper.ServerStream?.Dispose();
-                _pipeServerStreamWrapper = null;
+                if (_pipeServerStreamWrapper?.IsListening == true || _pipeServerStreamWrapper?.IsConnected == true)
+                {
+                    Configuration.Logger.LogInformation("Pipe server is already running.");
+                    return;
+                }
+
+                if (_pipeServerStreamWrapper?.IsListening == false)
+                {
+                    Configuration.Logger.LogInformation("Disposing existing pipe server stream wrapper for '{PipeName}'", Configuration.PipeName);
+                    _pipeServerStreamWrapper?.Dispose();
+                    _pipeServerStreamWrapper = null;
+                }
+
+                Configuration.Logger.LogInformation("Attempting to start named pipe server on '{PipeName}'", Configuration.PipeName);
+                var serverStream = new NamedPipeServerStream(
+                    Configuration.PipeName,
+                    PipeDirection.InOut,
+                    1,
+                    PipeTransmissionMode.Message,
+                    PipeOptions.Asynchronous);
+
+                _pipeServerStreamWrapper = new PipeServerStreamWrapper(serverStream);
             }
-
-            Id = Guid.NewGuid();
-            var serverStream = new NamedPipeServerStream(
-                Configuration.PipeName,
-                PipeDirection.InOut,
-                1,
-                PipeTransmissionMode.Message,
-                PipeOptions.Asynchronous);
-
-            _pipeServerStreamWrapper = new PipeServerStreamWrapper(serverStream);
+            catch (Exception ex)
+            {
+                Configuration.Logger.LogError(ex, "Failed to start named pipe server on '{PipeName}'", Configuration.PipeName);
+            }
         }
 
         private async Task HandlePipeStream()
@@ -94,7 +109,6 @@ namespace SeroGlint.DotNet.NamedPipes
             {
                 if (!_pipeServerStreamWrapper.IsConnected)
                 {
-                    IsListening = true;
                     await _pipeServerStreamWrapper.WaitForConnectionAsync(Configuration.CancellationTokenSource.Token);
                 }
 
@@ -178,23 +192,37 @@ namespace SeroGlint.DotNet.NamedPipes
 
         private PipeEnvelope<TTargetType> ReceiveMessage<TTargetType>(int bytesRead, byte[] buffer)
         {
-            var messageBytes = new byte[bytesRead];
-            Array.Copy(buffer, 0, messageBytes, 0, bytesRead);
+            try
+            {
+                var messageBytes = new byte[bytesRead];
+                Array.Copy(buffer, 0, messageBytes, 0, bytesRead);
 
-            var decryptedMessage = Configuration.EncryptionService.Decrypt(messageBytes);
-            var json = Encoding.UTF8.GetString(decryptedMessage);
-            var deserialized =
-                PipeEnvelope<TTargetType>.Deserialize<TTargetType>(json);
+                var decryptedMessage = Configuration.EncryptionService.Decrypt(messageBytes);
+                var json = Encoding.UTF8.GetString(decryptedMessage);
+                var deserialized =
+                    PipeEnvelope<TTargetType>.Deserialize<TTargetType>(json);
 
-            Configuration.Logger.LogInformation($"Received message on pipe. Message Id: {deserialized.MessageId}");
-            MessageReceived?.Invoke(this, new PipeMessageReceivedEventArgs(json, deserialized));
-            return deserialized;
+                Configuration.Logger.LogInformation($"Received message on pipe. Message Id: {deserialized.MessageId}");
+                MessageReceived?.Invoke(this, new PipeMessageReceivedEventArgs(json, deserialized));
+                return deserialized;
+            }
+            catch (Exception ex)
+            {
+                Configuration.Logger.LogError(ex, "Failed to deserialize message from pipe");
+            }
+
+            return new PipeEnvelope<TTargetType>()
+            {
+                MessageId = Guid.Empty,
+                Payload = default(TTargetType),
+                TypeName = typeof(TTargetType).FullName,
+                Timestamp = DateTime.MinValue
+            };
         }
 
         [ExcludeFromCodeCoverage]
         public void Dispose()
         {
-            IsListening = false;
             Configuration.CancellationTokenSource?.Cancel();
             MessageReceived = null;
             ResponseRequested = null;
@@ -209,16 +237,25 @@ namespace SeroGlint.DotNet.NamedPipes
                 return;
             }
 
-            var json = response.ToJson();
-            var bytes = Encoding.UTF8.GetBytes(json);
-
-            if (Configuration.UseEncryption)
+            try
             {
-                bytes = Configuration.EncryptionService.Encrypt(bytes);
-            }
+                var json = response.ToJson();
+                var bytes = Encoding.UTF8.GetBytes(json);
 
-            await _pipeServerStreamWrapper.WriteAsync(bytes, 0, bytes.Length, Configuration.CancellationTokenSource.Token);
-            await _pipeServerStreamWrapper.FlushAsync(Configuration.CancellationTokenSource.Token);
+                if (Configuration.UseEncryption)
+                {
+                    bytes = Configuration.EncryptionService.Encrypt(bytes);
+                }
+
+                Configuration.Logger.LogInformation("Responding to client on pipe {pipeName}", Configuration.PipeName);
+                await _pipeServerStreamWrapper.WriteAsync(bytes, 0, bytes.Length,
+                    Configuration.CancellationTokenSource.Token);
+                await _pipeServerStreamWrapper.FlushAsync(Configuration.CancellationTokenSource.Token);
+            }
+            catch (Exception ex)
+            {
+                Configuration.Logger.LogError(ex, "Failed to send response on pipe {pipeName}", Configuration.PipeName);
+            }
         }
     }
 }

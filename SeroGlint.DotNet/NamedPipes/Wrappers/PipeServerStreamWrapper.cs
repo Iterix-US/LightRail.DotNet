@@ -9,7 +9,8 @@ namespace SeroGlint.DotNet.NamedPipes.Wrappers
     [ExcludeFromCodeCoverage] // No need to test a wrapper pass-through
     public class PipeServerStreamWrapper : IPipeServerStreamWrapper
     {
-        public bool IsConnected => ServerStream.IsConnected;
+        public bool IsConnected => ServerStream?.IsConnected ?? false;
+        public bool IsListening { get; private set; }
         public NamedPipeServerStream ServerStream { get; }
 
         public PipeServerStreamWrapper(NamedPipeServerStream pipeServerStream = null)
@@ -19,6 +20,7 @@ namespace SeroGlint.DotNet.NamedPipes.Wrappers
 
         public async Task WaitForConnectionAsync(CancellationToken token)
         {
+            IsListening = true;
             await ServerStream.WaitForConnectionAsync(token);
         }
 
@@ -39,6 +41,7 @@ namespace SeroGlint.DotNet.NamedPipes.Wrappers
 
         public void Dispose()
         {
+            IsListening = false;
             ServerStream?.Dispose();
         }
     }

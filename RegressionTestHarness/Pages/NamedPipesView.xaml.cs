@@ -72,11 +72,13 @@ namespace RegressionTestHarness.Pages
             }
 
             await _namedPipeServer!.StartAsync();
+            txtServerStatus.Text = $"Server running ({_namedPipeServer.Id})";
         }
 
         private void btnStopServer_Click(object sender, RoutedEventArgs e)
         {
             _namedPipeServer?.Stop();
+            txtServerStatus.Text = "No server running";
         }
 
         private async void btnSendTestMessage_Click(object sender, RoutedEventArgs e)
