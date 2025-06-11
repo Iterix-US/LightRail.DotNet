@@ -21,7 +21,8 @@ namespace RegressionTestHarness.Pages
         private ILogger? _clientLogger;
         private NamedPipeServer? _namedPipeServer;
         private AesEncryptionService? _encryptionService;
-        private PipeServerConfiguration? _configuration;
+        private PipeServerConfiguration? _serverConfiguration;
+        private PipeClientConfiguration? _clientConfiguration;
 
         public NamedPipesView()
         {
@@ -35,10 +36,10 @@ namespace RegressionTestHarness.Pages
         {
             _encryptionService = new AesEncryptionService(EncryptionKey, _serverLogger);
 
-            _configuration = new PipeServerConfiguration();
-            _configuration.Initialize(
+            _serverConfiguration = new PipeServerConfiguration();
+            _serverConfiguration.Initialize(
                 null,
-                null,
+                "TestPipe",
                 _serverLogger,
                 _encryptionService,
                 new CancellationTokenSource());
@@ -55,7 +56,7 @@ namespace RegressionTestHarness.Pages
 
         private void InitializeServer()
         {
-            _namedPipeServer = new NamedPipeServer(_configuration);
+            _namedPipeServer = new NamedPipeServer(_serverConfiguration);
             _namedPipeServer.MessageReceived += NamedPipeServerMessageReceived;
             _namedPipeServer.ResponseRequested += NamedPipeServerResponseRequested;
         }
@@ -77,8 +78,21 @@ namespace RegressionTestHarness.Pages
                 Payload = new TestObject()
             };
 
-            var client = new NamedPipeClient(_configuration, _clientLogger);
-            await client.SendAsync(envelope);
+            if (_clientConfiguration == null)
+            {
+                _clientConfiguration = new PipeClientConfiguration();
+                _clientConfiguration.Initialize(
+                    ".",
+                    "TestPipe",
+                    _clientLogger,
+                    _encryptionService,
+                    new CancellationTokenSource());
+            }
+
+            var client = new NamedPipeClient(_clientConfiguration, _clientLogger);
+            var response = await client.SendAsync(envelope);
+
+            _clientConfiguration.Logger.LogInformation($"FROM PIPE CLIENT- Message received: {response}");
         }
 
         private void btnClearServerLog_Click(object sender, RoutedEventArgs e)
@@ -93,7 +107,22 @@ namespace RegressionTestHarness.Pages
 
         private void NamedPipeServerMessageReceived(object sender, PipeMessageReceivedEventArgs args)
         {
-            LstServerLog.Items.Add($"FROM PIPE SERVER- Received message: {args.Json}");
+            Dispatcher.Invoke(() =>
+            {
+                LstServerLog.Items.Add($"FROM PIPE SERVER- Received message: {args.Json}"); 
+            });
+
+            var parsedObject = args.DeserializedMessage as PipeEnvelope<TestObject>;
+            Dispatcher.Invoke(() =>
+            {
+                LstServerLog.Items.Add(
+                    $"FROM PIPE SERVER- Parsed object: " +
+                    $"{parsedObject?.TypeName ?? "null"}" +
+                    $"{parsedObject?.Payload?.Name}" +
+                    $"{parsedObject?.Payload?.Source}" +
+                    $"{parsedObject?.Payload?.Id}"
+                );
+            });
         }
 
         private Task NamedPipeServerResponseRequested(object sender, PipeResponseRequestedEventArgs args)

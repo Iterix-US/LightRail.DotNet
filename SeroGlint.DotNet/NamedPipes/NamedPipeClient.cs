@@ -43,12 +43,13 @@ namespace SeroGlint.DotNet.NamedPipes
             var serializedEnvelope = PrepareMessage(message);
             var client = EstablishClientStream();
 
-            using (client)
-            {
-                var sendResult = await SendThroughPipe(client, serializedEnvelope);
-                _logger.LogInformation(sendResult);
-                return await ParseResponse(client);
-            }
+            var sendResult = await SendThroughPipe(client, serializedEnvelope);
+            _logger.LogInformation(sendResult);
+
+            var response = await ParseResponse(client);
+            _logger.LogInformation("Response received from server.");
+
+            return response;
         }
 
         private async Task<string> ParseResponse(IPipeClientStreamWrapper client)
@@ -111,11 +112,20 @@ namespace SeroGlint.DotNet.NamedPipes
 
         private async Task WriteToStream(IPipeClientStreamWrapper client, byte[] serializedEnvelope)
         {
-            await client.ConnectAsync(Configuration.CancellationTokenSource.Token);
-            _logger.LogInformation($"Connected to pipe {Configuration.PipeName} on server {Configuration.ServerName}");
+            try
+            {
+                await client.ConnectAsync(Configuration.CancellationTokenSource.Token);
+                _logger.LogInformation(
+                    $"Connected to pipe {Configuration.PipeName} on server {Configuration.ServerName}");
 
-            await client.WriteAsync(serializedEnvelope, 0, serializedEnvelope.Length, Configuration.CancellationTokenSource.Token);
-            await client.FlushAsync(Configuration.CancellationTokenSource.Token);
+                await client.WriteAsync(serializedEnvelope, 0, serializedEnvelope.Length,
+                    Configuration.CancellationTokenSource.Token);
+                await client.FlushAsync(Configuration.CancellationTokenSource.Token);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error writing to pipe {Configuration.PipeName} on server {Configuration.ServerName}");
+            }
         }
 
         private byte[] PrepareMessage<T>(IPipeEnvelope<T> message)
@@ -135,16 +145,18 @@ namespace SeroGlint.DotNet.NamedPipes
 
         private IPipeClientStreamWrapper EstablishClientStream()
         {
-            if (_pipeClientStreamWrapper == null)
+            if (_pipeClientStreamWrapper != null)
             {
-                var clientStream = new NamedPipeClientStream(
+                return _pipeClientStreamWrapper;
+            }
+
+            var clientStream = new NamedPipeClientStream(
                     Configuration.ServerName,
                     Configuration.PipeName,
                     PipeDirection.InOut,
                     PipeOptions.Asynchronous);
 
-                _pipeClientStreamWrapper = new PipeClientStreamWrapper(clientStream);
-            }
+            _pipeClientStreamWrapper = new PipeClientStreamWrapper(clientStream);
 
             _logger.LogInformation($"Using client (server name: {Configuration.ServerName}) and pipe '{Configuration.PipeName}'");
             return _pipeClientStreamWrapper;

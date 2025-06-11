@@ -39,39 +39,46 @@ namespace SeroGlint.DotNet.NamedPipes
         /// <exception cref="Exception"></exception>
         public async Task StartAsync()
         {
-            while (!Configuration.CancellationTokenSource.IsCancellationRequested)
+            Start();
+            using (_pipeServerStreamWrapper.ServerStream)
             {
-                await Start();
+                while (!Configuration.CancellationTokenSource.IsCancellationRequested)
+                {
+                    await HandlePipeStream();
+                }
             }
+
             Configuration.Logger.LogInformation("Waiting for connection on pipe '{PipeName}'...", Configuration.PipeName);
             Configuration.Logger.LogInformation("Waiting for messages on pipe '{PipeName}'...", Configuration.PipeName);
         }
 
-        private async Task Start()
+        private void Start()
         {
-            if (_pipeServerStreamWrapper == null)
+            if (_pipeServerStreamWrapper?.IsConnected == false)
             {
-                var serverStream = new NamedPipeServerStream(
-                    Configuration.PipeName,
-                    PipeDirection.InOut,
-                    1,
-                    PipeTransmissionMode.Message,
-                    PipeOptions.Asynchronous);
-
-                _pipeServerStreamWrapper = new PipeServerStreamWrapper(serverStream);
+                _pipeServerStreamWrapper.ServerStream?.Dispose();
+                _pipeServerStreamWrapper = null;
             }
 
-            using (_pipeServerStreamWrapper.ServerStream)
-            {
-                await HandlePipeStream();
-            }
+            var serverStream = new NamedPipeServerStream(
+                Configuration.PipeName,
+                PipeDirection.InOut,
+                1,
+                PipeTransmissionMode.Message,
+                PipeOptions.Asynchronous);
+
+            _pipeServerStreamWrapper = new PipeServerStreamWrapper(serverStream);
         }
 
         private async Task HandlePipeStream()
         {
             try
             {
-                await _pipeServerStreamWrapper.WaitForConnectionAsync(Configuration.CancellationTokenSource.Token);
+                if (!_pipeServerStreamWrapper.IsConnected)
+                {
+                    await _pipeServerStreamWrapper.WaitForConnectionAsync(Configuration.CancellationTokenSource.Token);
+                }
+
                 Configuration.Logger.LogInformation("Client connected on '{PipeName}'", Configuration.PipeName);
 
                 var buffer = new byte[4096];
@@ -104,16 +111,7 @@ namespace SeroGlint.DotNet.NamedPipes
 
             try
             {
-                var messageBytes = new byte[bytesRead];
-                Array.Copy(buffer, 0, messageBytes, 0, bytesRead);
-
-                var decryptedMessage = Configuration.EncryptionService.Decrypt(messageBytes);
-                var message = Encoding.UTF8.GetString(decryptedMessage);
-                var deserialized =
-                    PipeEnvelope<TTargetType>.Deserialize<TTargetType>(message);
-
-                Configuration.Logger.LogInformation($"Received message on pipe. Message Id: {deserialized.MessageId}");
-                MessageReceived?.Invoke(this, new PipeMessageReceivedEventArgs(message, deserialized));
+                var deserialized = ReceiveMessage<TTargetType>(bytesRead, buffer);
 
                 var envelope = new PipeEnvelope<dynamic>
                 {
@@ -145,6 +143,21 @@ namespace SeroGlint.DotNet.NamedPipes
                     envelope,
                     _pipeServerStreamWrapper.ServerStream));
             }
+        }
+
+        private PipeEnvelope<TTargetType> ReceiveMessage<TTargetType>(int bytesRead, byte[] buffer)
+        {
+            var messageBytes = new byte[bytesRead];
+            Array.Copy(buffer, 0, messageBytes, 0, bytesRead);
+
+            var decryptedMessage = Configuration.EncryptionService.Decrypt(messageBytes);
+            var json = Encoding.UTF8.GetString(decryptedMessage);
+            var deserialized =
+                PipeEnvelope<TTargetType>.Deserialize<TTargetType>(json);
+
+            Configuration.Logger.LogInformation($"Received message on pipe. Message Id: {deserialized.MessageId}");
+            MessageReceived?.Invoke(this, new PipeMessageReceivedEventArgs(json, deserialized));
+            return deserialized;
         }
 
         [ExcludeFromCodeCoverage]
