@@ -71,6 +71,7 @@
                     FontSize="18" />
 
                 <TextBlock 
+                    x:Name="txtServerStatus"
                     Grid.Row="0"
                     Grid.Column="0"
                     Text="Not running" 

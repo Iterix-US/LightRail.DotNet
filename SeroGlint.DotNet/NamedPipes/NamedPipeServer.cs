@@ -19,16 +19,31 @@ namespace SeroGlint.DotNet.NamedPipes
     /// </summary>
     public class NamedPipeServer : INamedPipeServer
     {
+        public Guid Id { get; private set; }
+        public bool IsListening { get; private set; }
         public PipeServerConfiguration Configuration { get; }
         private IPipeServerStreamWrapper _pipeServerStreamWrapper;
 
         public event PipeMessageReceivedHandler MessageReceived;
         public event PipeResponseRequestedHandler ResponseRequested;
+        public event PipeServerStateChangedHandler ServerStateChanged;
 
         public NamedPipeServer(PipeServerConfiguration configuration, IPipeServerStreamWrapper pipeServerStreamWrapper = null)
         {
             Configuration = configuration;
             _pipeServerStreamWrapper = pipeServerStreamWrapper;
+        }
+
+        public void StopAsync()
+        {
+            if (!IsListening)
+            {
+                Configuration.Logger.LogInformation("Server is not listening. No need to stop.");
+                return;
+            }
+
+            NotifyServerStopped();
+            Dispose();
         }
 
         /// <summary>
@@ -42,6 +57,8 @@ namespace SeroGlint.DotNet.NamedPipes
             Start();
             using (_pipeServerStreamWrapper.ServerStream)
             {
+                NotifyServerStarted();
+
                 while (!Configuration.CancellationTokenSource.IsCancellationRequested)
                 {
                     await HandlePipeStream();
@@ -60,6 +77,7 @@ namespace SeroGlint.DotNet.NamedPipes
                 _pipeServerStreamWrapper = null;
             }
 
+            Id = new Guid();
             var serverStream = new NamedPipeServerStream(
                 Configuration.PipeName,
                 PipeDirection.InOut,
@@ -76,6 +94,7 @@ namespace SeroGlint.DotNet.NamedPipes
             {
                 if (!_pipeServerStreamWrapper.IsConnected)
                 {
+                    IsListening = true;
                     await _pipeServerStreamWrapper.WaitForConnectionAsync(Configuration.CancellationTokenSource.Token);
                 }
 
@@ -99,6 +118,16 @@ namespace SeroGlint.DotNet.NamedPipes
                     envelope,
                     _pipeServerStreamWrapper.ServerStream));
             }
+        }
+
+        private void NotifyServerStopped()
+        {
+            ServerStateChanged?.Invoke(this, PipeServerStateChangedEventArgs.SetPipeServerStopped(this));
+        }
+
+        private void NotifyServerStarted()
+        {
+            ServerStateChanged?.Invoke(this, PipeServerStateChangedEventArgs.SetPipeServerStarted(this));
         }
 
         internal async Task HandleMessage<TTargetType>(int bytesRead, byte[] buffer)
@@ -163,6 +192,7 @@ namespace SeroGlint.DotNet.NamedPipes
         [ExcludeFromCodeCoverage]
         public void Dispose()
         {
+            IsListening = false;
             Configuration.CancellationTokenSource?.Cancel();
             MessageReceived = null;
             ResponseRequested = null;

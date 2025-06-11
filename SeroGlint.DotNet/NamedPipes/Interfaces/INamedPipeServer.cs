@@ -11,6 +11,16 @@ namespace SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces
     public interface INamedPipeServer : IDisposable
     {
         /// <summary>
+        /// Unique identifier for the named pipe server instance.
+        /// </summary>
+        Guid Id { get; }
+
+        /// <summary>
+        /// Indicates whether the named pipe server is currently listening for messages.
+        /// </summary>
+        bool IsListening { get; }
+
+        /// <summary>
         /// Configuration settings for the named pipe server.
         /// </summary>
         PipeServerConfiguration Configuration { get; }
@@ -25,5 +35,11 @@ namespace SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces
         /// </summary>
         /// <returns></returns>
         Task StartAsync();
+
+        /// <summary>
+        /// Requests, via CancellationTokenSource, that the named pipe server stops listening for messages and cleans up resources.
+        /// </summary>
+        /// <returns></returns>
+        void StopAsync();
     }
 }

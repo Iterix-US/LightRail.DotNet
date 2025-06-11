@@ -47,10 +47,12 @@ namespace RegressionTestHarness.Pages
 
         private void InitializeLogger()
         {
-            _serverLogger = ListBoxLogger.RouteLoggerToListBox(Dispatcher, LstServerLog, "NamedPipeServerTestHarness");
+            _serverLogger =
+                ListBoxLogger.RouteLoggerToListBox(Dispatcher, LstServerLog, "NamedPipeServerTestHarness", "Server");
             _serverLogger?.LogInformation("Server logger initialized in test harness.");
 
-            _clientLogger = ListBoxLogger.RouteLoggerToListBox(Dispatcher, LstClientLog, "NamedPipeClientTestHarness");
+            _clientLogger =
+                ListBoxLogger.RouteLoggerToListBox(Dispatcher, LstClientLog, "NamedPipeClientTestHarness", "Client");
             _clientLogger?.LogInformation("Client logger initialized in test harness.");
         }
 
@@ -59,16 +61,19 @@ namespace RegressionTestHarness.Pages
             _namedPipeServer = new NamedPipeServer(_serverConfiguration);
             _namedPipeServer.MessageReceived += NamedPipeServerMessageReceived;
             _namedPipeServer.ResponseRequested += NamedPipeServerResponseRequested;
+            _namedPipeServer.ServerStateChanged += NamedPipeServerStateChanged;
         }
 
         private async void btnStartServer_Click(object sender, RoutedEventArgs e)
         {
-            await Task.Run(() => _namedPipeServer?.StartAsync()!);
+            await _namedPipeServer?.StartAsync()!;
+            txtServerStatus.Text = "Running";
         }
 
         private void btnStopServer_Click(object sender, RoutedEventArgs e)
         {
             _namedPipeServer?.Configuration.CancellationTokenSource.Cancel();
+            txtServerStatus.Text = "Not running";
         }
 
         private async void btnSendTestMessage_Click(object sender, RoutedEventArgs e)
@@ -109,30 +114,37 @@ namespace RegressionTestHarness.Pages
         {
             Dispatcher.Invoke(() =>
             {
-                LstServerLog.Items.Add($"FROM PIPE SERVER- Received message: {args.Json}"); 
+                LstServerLog.Items.Add($"UI Server Log Capture- Received message: {args.Json}");
             });
 
-            var parsedObject = args.DeserializedMessage as PipeEnvelope<TestObject>;
-            Dispatcher.Invoke(() =>
-            {
-                LstServerLog.Items.Add(
-                    $"FROM PIPE SERVER- Parsed object: " +
-                    $"{parsedObject?.TypeName ?? "null"}" +
-                    $"{parsedObject?.Payload?.Name}" +
-                    $"{parsedObject?.Payload?.Source}" +
-                    $"{parsedObject?.Payload?.Id}"
-                );
-            });
+            var parsedObject = args.Json.FromJsonToType<PipeEnvelope<TestObject>>();
+            var logMessage = $"UI Server Log Capture- Parsed object:\n" +
+                             $"Type- {parsedObject?.TypeName ?? "null"}\n" +
+                             $"Name- {parsedObject?.Payload?.Name}\n" +
+                             $"Source- {parsedObject?.Payload?.Source}\n" +
+                             $"Payload Id- {parsedObject?.Payload?.Id}\n";
+
+            _serverLogger?.LogInformation(logMessage);
         }
 
         private Task NamedPipeServerResponseRequested(object sender, PipeResponseRequestedEventArgs args)
         {
+            var logMessage = $"UI Server Log Capture- Response requested for message ID " +
+                             $"{args.ResponseObject.MessageId}: " +
+                             $"{args.ResponseObject.ToJson()}";
+            
+            _serverLogger?.LogInformation(logMessage);
+
+            return Task.CompletedTask;
+        }
+
+        private Task NamedPipeServerStateChanged(object sender, PipeServerStateChangedEventArgs args)
+        {
+            var logMessage = args.GetLogMessage();
             Dispatcher.Invoke(() =>
             {
                 LstServerLog.Items.Add(
-                    $"FROM PIPE SERVER- Response requested for message ID " +
-                    $"{args.ResponseObject.MessageId}: " +
-                    $"{args.ResponseObject.ToJson()}"
+                    logMessage
                 );
             });
 

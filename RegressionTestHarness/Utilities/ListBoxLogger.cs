@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.IO;
+using Microsoft.Extensions.Logging;
 using SeroGlint.DotNet.Logging;
 using SeroGlint.DotNet;
 using System.Windows.Controls;
@@ -25,10 +26,12 @@ public class ListBoxLogger(string category, Action<string> logAction) : ILogger
         logAction(message);
     }
 
-    internal static ILogger? RouteLoggerToListBox(Dispatcher dispatcher, ListBox targetListBox, string category)
+    internal static ILogger? RouteLoggerToListBox(Dispatcher dispatcher, ListBox targetListBox, string category, string fileSuffix)
     {
+        var logPath = Path.Combine(Environment.CurrentDirectory, "SeroGlint_Logs");
         var coreLogger = new LoggerFactoryBuilder()
             .EnableConsoleOutput()
+            .EnableFileOutput(true, logPath, $"THarness_{fileSuffix}", "sglog")
             .SetMinimumLevel(LoggingLevel.Debug)
             .SetOutputTemplate("{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
             .SetCategory(category)
@@ -39,7 +42,9 @@ public class ListBoxLogger(string category, Action<string> logAction) : ILogger
             builder.AddProvider(new ListBoxLoggerProvider(message => AppendLog(dispatcher, targetListBox, message)));
         });
 
-        return new CompositeLogger(coreLogger, factory.CreateLogger(category));
+        var logger = new CompositeLogger(coreLogger, factory.CreateLogger(category));
+        logger.LogInformation("Log can be found in {directory}", logPath);
+        return logger;
     }
 
     private static void AppendLog(Dispatcher dispatcher, ListBox listBoxControl, string message)
