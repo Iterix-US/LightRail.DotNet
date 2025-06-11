@@ -66,14 +66,17 @@ namespace RegressionTestHarness.Pages
 
         private async void btnStartServer_Click(object sender, RoutedEventArgs e)
         {
-            await _namedPipeServer?.StartAsync()!;
-            txtServerStatus.Text = "Running";
+            if (_namedPipeServer == null)
+            {
+                InitializeServer();
+            }
+
+            await _namedPipeServer!.StartAsync();
         }
 
         private void btnStopServer_Click(object sender, RoutedEventArgs e)
         {
-            _namedPipeServer?.Configuration.CancellationTokenSource.Cancel();
-            txtServerStatus.Text = "Not running";
+            _namedPipeServer?.Stop();
         }
 
         private async void btnSendTestMessage_Click(object sender, RoutedEventArgs e)
@@ -118,20 +121,20 @@ namespace RegressionTestHarness.Pages
             });
 
             var parsedObject = args.Json.FromJsonToType<PipeEnvelope<TestObject>>();
-            var logMessage = $"UI Server Log Capture- Parsed object:\n" +
-                             $"Type- {parsedObject?.TypeName ?? "null"}\n" +
-                             $"Name- {parsedObject?.Payload?.Name}\n" +
-                             $"Source- {parsedObject?.Payload?.Source}\n" +
-                             $"Payload Id- {parsedObject?.Payload?.Id}\n";
+            var logMessage = $"\n\tUI Server Log Capture- Parsed object:\n" +
+                             $"\tType- {parsedObject?.TypeName ?? "null"}\n" +
+                             $"\tName- {parsedObject?.Payload?.Name}\n" +
+                             $"\tSource- {parsedObject?.Payload?.Source}\n" +
+                             $"\tPayload Id- {parsedObject?.Payload?.Id}";
 
             _serverLogger?.LogInformation(logMessage);
         }
 
         private Task NamedPipeServerResponseRequested(object sender, PipeResponseRequestedEventArgs args)
         {
-            var logMessage = $"UI Server Log Capture- Response requested for message ID " +
-                             $"{args.ResponseObject.MessageId}: " +
-                             $"{args.ResponseObject.ToJson()}";
+            var logMessage = $"\n\tUI Server Log Capture- Response requested\n" +
+                             $"\tMessage Id: {args.ResponseObject.MessageId}\n" +
+                             $"\t{args.ResponseObject.ToJson()}";
             
             _serverLogger?.LogInformation(logMessage);
 
@@ -140,13 +143,8 @@ namespace RegressionTestHarness.Pages
 
         private Task NamedPipeServerStateChanged(object sender, PipeServerStateChangedEventArgs args)
         {
-            var logMessage = args.GetLogMessage();
-            Dispatcher.Invoke(() =>
-            {
-                LstServerLog.Items.Add(
-                    logMessage
-                );
-            });
+            var logMessage = args.GetLogMessage() ?? "Failure to change server state";
+            _serverLogger?.LogInformation(logMessage);
 
             return Task.CompletedTask;
         }

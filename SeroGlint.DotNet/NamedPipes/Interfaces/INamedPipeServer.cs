@@ -40,6 +40,6 @@ namespace SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces
         /// Requests, via CancellationTokenSource, that the named pipe server stops listening for messages and cleans up resources.
         /// </summary>
         /// <returns></returns>
-        void StopAsync();
+        void Stop();
     }
 }

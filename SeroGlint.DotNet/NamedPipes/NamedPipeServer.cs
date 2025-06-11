@@ -34,7 +34,7 @@ namespace SeroGlint.DotNet.NamedPipes
             _pipeServerStreamWrapper = pipeServerStreamWrapper;
         }
 
-        public void StopAsync()
+        public void Stop()
         {
             if (!IsListening)
             {
@@ -77,7 +77,7 @@ namespace SeroGlint.DotNet.NamedPipes
                 _pipeServerStreamWrapper = null;
             }
 
-            Id = new Guid();
+            Id = Guid.NewGuid();
             var serverStream = new NamedPipeServerStream(
                 Configuration.PipeName,
                 PipeDirection.InOut,
@@ -122,11 +122,13 @@ namespace SeroGlint.DotNet.NamedPipes
 
         private void NotifyServerStopped()
         {
+            Configuration.Logger.LogInformation($"Pipe server manually stopped. Pipe Id: {Id}");
             ServerStateChanged?.Invoke(this, PipeServerStateChangedEventArgs.SetPipeServerStopped(this));
         }
 
         private void NotifyServerStarted()
         {
+            Configuration.Logger.LogInformation($"Pipe server manually started. Pipe Id: {Id}");
             ServerStateChanged?.Invoke(this, PipeServerStateChangedEventArgs.SetPipeServerStarted(this));
         }
 
