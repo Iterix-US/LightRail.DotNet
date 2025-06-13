@@ -52,6 +52,17 @@ namespace SeroGlint.DotNet.NamedPipes
             return response;
         }
 
+        public void Disconnect()
+        {
+            if (!_pipeClientStreamWrapper.IsConnected)
+            {
+                Configuration.Logger.LogInformation("Client is not connected");
+            }
+
+            Configuration.Logger.LogInformation("Client is disconnected");
+            _pipeClientStreamWrapper.Dispose();
+        }
+
         private async Task<string> ParseResponse(IPipeClientStreamWrapper client)
         {
             try

@@ -14,5 +14,7 @@ namespace SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces
         /// <param name="pipeEnvelope"></param>
         /// <returns></returns>
         Task<string> SendAsync<T>(IPipeEnvelope<T> pipeEnvelope);
+
+        void Disconnect();
     }
 }
