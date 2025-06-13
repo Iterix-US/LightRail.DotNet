@@ -1,12 +1,12 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using NSubstitute;
 using SeroGlint.DotNet.Abstractions;
 using SeroGlint.DotNet.FileManagement;
 using SeroGlint.DotNet.Tests.TestObjects;
-using NSubstitute;
 using Shouldly;
 
-namespace SeroGlint.DotNet.Tests
+namespace SeroGlint.DotNet.Tests.TestClasses.IO
 {
     public class ConfigurationLoaderTests
     {

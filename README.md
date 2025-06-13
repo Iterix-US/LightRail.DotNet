@@ -1,129 +1,75 @@
 # SeroGlint.DotNet
 
-**A powerful yet lightweight toolkit that simplifies, accelerates, and enhances your .NET development.**
+A modular collection of utilities, interfaces, and service builders designed to simplify .NET development for cross-cutting concerns like logging, configuration, encryption, and messaging.
 
 ---
 
-## 🚦 **What is SeroGlint.DotNet?**
+## 📚 Projects and Documentation
 
-At Iterix, we know that the repetitive tasks in software development slow teams down.  
-**SeroGlint.DotNet** is our solution—a carefully designed library filled with elegant extension methods, converters, serialization utilities, and common tools tailored specifically for .NET developers. Our mission is straightforward: eliminate boilerplate, reduce friction, and enable your team to build better software, faster.
+Each major component is documented with its own markdown file under the `Documentation` directory.
 
----
-
-## ⚙️ **Core Features**
-
-- **Primitive Extensions**  
-  Simple yet powerful enhancements for strings, dates, numeric types, and more, to streamline your day-to-day coding.
-
-- **Serialization Helpers (XML & JSON)**  
-  Consistent, hassle-free serialization and deserialization methods that help you manage data effortlessly.
-
-- **Structured Logging Builders**  
-  Drop-in builders for Serilog and NLog via a unified API, built for testability and DI registration.
-
-- **Robust & Tested**  
-  Fully unit-tested to guarantee reliability, ensuring you always have dependable tools at your fingertips.
-
-- **Cross-Platform Ready**  
-  Built for compatibility with .NET 8+, .NET Standard, and future platforms—ready to deploy anywhere you need it.
+| Component                            | Description                                                              | Documentation File                                           |
+|--------------------------------------|--------------------------------------------------------------------------|--------------------------------------------------------------|
+| `ConfigurationLoader`               | Loads configuration files with support for mocks and tests.             | [ConfigurationLoader.md](Documentation/ConfigurationLoader.md) |
+| `ILoggerBuilder`                    | Provides extensible logging setup with Serilog/NLog.                    | [ILoggerBuilder.md](Documentation/ILoggerBuilder.md)             |
+| `PasswordUtility`                   | Secure password hashing and validation helper.                          | [PasswordUtility.md](Documentation/PasswordUtility.md)           |
+| `AesEncryptionService`              | AES-256 encryption wrapper with logging and IV derivation.              | [AesEncryptionService.md](Documentation/AesEncryptionService.md) |
+| `PipeEnvelope<T>`                   | Represents a typed, serializable message envelope.                      | [PipeEnvelope.md](Documentation/PipeEnvelope.md)                 |
+| `NamedPipeClient`                   | Sends encrypted or plain messages over named pipes.                     | [NamedPipeClient.md](Documentation/NamedPipeClient.md)           |
+| `NamedPipeServerCore`              | Listens for connections and handles message routing.                    | [NamedPipeServerCore.md](Documentation/NamedPipeServerCore.md)   |
+| `PipeMessageReceivedEventArgs`     | Event args used when a message is received on the server.               | [PipeMessageReceivedEventArgs.md](Documentation/PipeMessageReceivedEventArgs.md) |
+| `PipeResponseRequestedEventArgs`   | Event args used when a response is triggered by the server.             | [PipeResponseRequestedEventArgs.md](Documentation/PipeResponseRequestedEventArgs.md) |
+| `INamedPipeClient`                 | Interface abstraction for the named pipe client.                        | [INamedPipeClient.md](Documentation/INamedPipeClient.md)         |
+| `INamedPipeServerCore`            | Interface abstraction for the server core.                              | [INamedPipeServerCore.md](Documentation/INamedPipeServerCore.md) |
+| `INamedPipeConfigurator`          | Interface describing the pipe config (e.g., server, pipe name, encryption). | [NamedPipeConfigurator.md](Documentation/NamedPipeConfigurator.md) |
 
 ---
 
-## 🚀 **Quick Examples**
+## 📦 NuGet Dependencies
 
-**Serialize an object to XML quickly:**
+These packages are required when using `SeroGlint.DotNet`:
 
-```csharp
-var user = new User { Id = 1, Name = "Iterix" };
-var xml = user.ToXml();
+| Package                                  | Version | Purpose                                                                 |
+|------------------------------------------|---------|-------------------------------------------------------------------------|
+| `Microsoft.Extensions.Logging.Abstractions` | 9.0.4   | Standard logging interfaces for dependency injection and mockability    |
+| `NLog`                                   | 5.4.0   | Core NLog logging engine                                                |
+| `NLog.Extensions.Hosting`                | 5.4.0   | Integration with `IHostBuilder`                                         |
+| `NLog.Extensions.Logging`                | 5.4.0   | Connects NLog to `ILogger`                                              |
+| `NLog.Web.AspNetCore`                    | 5.4.0   | ASP\.NET Core integration for NLog                                       |
+| `Serilog`                                | 4.2.0   | Core Serilog logging engine                                             |
+| `Serilog.AspNetCore`                     | 9.0.0   | ASP\.NET Core-specific extensions                                        |
+| `Serilog.Extensions.Hosting`             | 9.0.0   | Hosting integration                                                     |
+| `Serilog.Sinks.Console`                  | 6.0.0   | Console logging for Serilog                                             |
+| `Serilog.Sinks.Debug`                    | 3.0.0   | Debug output sink                                                       |
+| `Serilog.Sinks.File`                     | 7.0.0   | File logging output                                                     |
+| `System.Security.Cryptography.Algorithms`| 4.3.1   | Enables AES encryption in secure communication                         |
+| `System.Text.Json`                       | 9.0.3   | JSON (de)serialization used across pipe messaging and utilities         |
+
+
+## 🧪 Testing
+
+Unit tests are written using `xUnit` and `NSubstitute`, following the Arrange-Act-Assert pattern. Most components are fully mockable and testable due to interface abstractions.
+
+Run all tests:
+
+```bash
+dotnet test
 ```
 
-**Easily deserialize JSON strings:**
+---
 
-```csharp
-var jsonString = "{"Id":1,"Name":"Iterix"}";
-var user = jsonString.FromJson<User>();
-```
+## 🔐 Security & Reliability
 
-**Date extensions that make sense:**
-
-```csharp
-var future = DateTime.Now.Plus(years: 1, months: 3);
-var past = DateTime.Now.Minus(years: 1, months: 3, days: 4, hours: 10, minutes: 15, seconds: 34, milliseconds: 120);
-```
+- Internal helpers (like `AesEncryptionService`) isolate security logic from consumer code.
+- Named pipe handlers include cancellation support and structured error logging.
+- All I/O logic is abstracted for testability.
 
 ---
 
-## 📂 **API Documentation**
+## 🤝 Contributions
 
-You can find detailed documentation for each class or utility in the [`Documentation`](./Documentation) folder:
-
-### 🔧 Core Extensions
-
-- [BooleanExtensions](./Documentation/BooleanExtensions.md)
-- [ByteExtensions](./Documentation/ByteExtensions.md)
-- [DateTimeExtensions](./Documentation/DateTimeExtensions.md)
-- [DecimalExtensions](./Documentation/DecimalExtensions.md)
-- [EnumExtensions](./Documentation/EnumExtensions.md)
-- [IntegerExtensions](./Documentation/IntegerExtensions.md)
-- [ObjectExtensions](./Documentation/ObjectExtensions.md)
-- [StringExtensions](./Documentation/StringExtensions.md)
-
-### 🔐 Configuration & Utilities
-
-- [ConfigurationLoader](./Documentation/ConfigurationLoader.md)
-- [PasswordUtility](./Documentation/PasswordUtility.md)
-- [Enums](./Documentation/Enums.md)
-- [IDirectoryManagement](./Documentation/IDirectoryManagement.md)
-
-### 📝 Logging System
-
-- [LoggerFactoryBuilder](./Documentation/LoggerFactoryBuilder.md)
-- [SerilogBuilder](./Documentation/SerilogBuilder.md)
-- [NLogBuilder](./Documentation/NLogBuilder.md)
-- [ILoggerBuilder](./Documentation/ILoggerBuilder.md)
-- [LoggerBuilderBase](./Documentation/LoggerBuilderBase.md)
+Contributions are welcome! Please follow the [guidelines](CONTRIBUTING.md) and submit PRs with clear descriptions and passing tests.
 
 ---
 
-## 🧪 **Reliability & Quality Assurance**
-
-We take quality seriously. Each component is thoroughly unit tested, and we continuously strive for 100% test coverage for our logic. Reliable software is at the core of our philosophy—and yours.
-
----
-
-## 📜 **License**
-
-SeroGlint.DotNet is proudly licensed under the **Mozilla Public License 2.0 (MPL-2.0)**, ensuring open usage while clearly defining how contributions and modifications should happen.  
-See the [LICENSE](LICENSE) file for full details.
-
----
-
-## 🗣️ **Feedback & Contributions**
-
-Have a suggestion or improvement? **We love collaboration!**
-
-- Submit issues or pull requests on GitHub
-- Visit our website [iterix.net](https://iterix.net/) for additional insights or contact our team directly.
-
-We welcome your input and appreciate your contributions.
-
----
-
-## 🔗 **Who We Are**
-
-Learn more about us at [iterix.net](https://iterix.net).
-
----
-
-## 🛣️ **Future Features**
-
-- Interface + wrapper classes for externally dependent tooling
-  1. Allows for unit testing to be more fluid
-  2. Does impose a memory usage overhead, but may be worth the cost to ensure functional stability
-  3. Mainly for namespaces like Registry, File, Directory, etc.
-- AI-assisted translations
-  1. Still thinking about this one.
-  2. I'm usually pretty hesitent about implementing AI tooling
-  3. Would need to be able to cache/store translations locally or to a local area network device in case of internet outage
+© Iterix · Built for performance, extensibility, and clarity
