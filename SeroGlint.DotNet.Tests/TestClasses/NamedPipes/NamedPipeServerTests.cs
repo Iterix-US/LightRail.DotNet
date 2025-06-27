@@ -6,7 +6,7 @@ using SeroGlint.DotNet.Extensions;
 using SeroGlint.DotNet.NamedPipes;
 using SeroGlint.DotNet.NamedPipes.Interfaces;
 using SeroGlint.DotNet.NamedPipes.Objects;
-using SeroGlint.DotNet.SecurityUtilities.SecurityInterfaces;
+using SeroGlint.DotNet.Security.Interfaces;
 using SeroGlint.DotNet.Tests.TestObjects;
 using Shouldly;
 using Xunit.Abstractions;
@@ -311,7 +311,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             logger
                 .When(x => x.Log(
                     LogLevel.Information,
-                    80862,
+                    LoggingEventId.ServerNotRunning.GetValue(),
                     Arg.Do<object>(state => captured = state.ToString()),
                     Arg.Any<Exception>(),
                     Arg.Any<Func<object, Exception, string>>()!))
@@ -347,7 +347,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             logger
                 .When(x => x.Log(
                     LogLevel.Information,
-                    65845,
+                    LoggingEventId.DisposingExistingPipe.GetValue(),
                     Arg.Do<object>(state => captured = state.ToString()),
                     Arg.Any<Exception>(),
                     Arg.Any<Func<object, Exception, string>>()!))

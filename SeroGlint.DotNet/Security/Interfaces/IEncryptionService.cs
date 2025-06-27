@@ -1,4 +1,4 @@
-﻿namespace SeroGlint.DotNet.SecurityUtilities.SecurityInterfaces
+﻿namespace SeroGlint.DotNet.Security.Interfaces
 {
     public interface IEncryptionService
     {

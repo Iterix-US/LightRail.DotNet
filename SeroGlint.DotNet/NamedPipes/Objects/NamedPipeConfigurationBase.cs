@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using SeroGlint.DotNet.NamedPipes.Interfaces;
-using SeroGlint.DotNet.SecurityUtilities.SecurityInterfaces;
+using SeroGlint.DotNet.Security.Interfaces;
 
 namespace SeroGlint.DotNet.NamedPipes.Objects
 {

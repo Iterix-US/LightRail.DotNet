@@ -2,9 +2,9 @@
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Logging;
-using SeroGlint.DotNet.SecurityUtilities.SecurityInterfaces;
+using SeroGlint.DotNet.Security.Interfaces;
 
-namespace SeroGlint.DotNet.SecurityUtilities
+namespace SeroGlint.DotNet.Security
 {
     /// <summary>
     /// Provides AES encryption and decryption functionality.

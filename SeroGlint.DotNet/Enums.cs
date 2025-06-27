@@ -91,4 +91,18 @@ namespace SeroGlint.DotNet
         [Description("Operation Failed")]
         OperationFailed = 105,
     }
+
+    public enum LoggingEventId
+    {
+        [Description("")]
+        None = 0,
+        [Description("Server is not running. No need to stop.")]
+        ServerNotRunning = 80862,
+        [Description("Disposing Pipe")]
+        DisposingExistingPipe = 65845,
+        [Description("Event Id for testing purposes only")]
+        ReusingExistingPipe = 80841,
+        [Description("Write Pipe Error")]
+        WritePipeError = 48846
+    }
 }

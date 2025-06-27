@@ -36,6 +36,24 @@ namespace SeroGlint.DotNet.Extensions
         }
 
         /// <summary>
+        /// Retrieves the integer value of an enum, assuming the enum is defined with integer values.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="enumValue"></param>
+        /// <returns></returns>
+        public static int GetValue<T>(this T enumValue) where T : Enum
+        {
+            try
+            {
+                return Convert.ToInt32(enumValue);
+            }
+            catch
+            {
+                return -1;
+            }
+        }
+
+        /// <summary>
         /// Converts a <see cref="LoggingLevel"/> to a <see cref="LogEventLevel"/> for use with Serilog.
         /// </summary>
         /// <param name="level"></param>

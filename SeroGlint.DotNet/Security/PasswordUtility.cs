@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Logging;
 
-namespace SeroGlint.DotNet.SecurityUtilities
+namespace SeroGlint.DotNet.Security
 {
     /// <summary>
     /// Provides secure hashing and verification utilities using PBKDF2 with HMAC-SHA256.

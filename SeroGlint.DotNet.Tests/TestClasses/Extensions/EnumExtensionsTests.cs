@@ -4,6 +4,7 @@ using NLog.Targets;
 using Serilog;
 using Serilog.Events;
 using SeroGlint.DotNet.Extensions;
+using SeroGlint.DotNet.Tests.TestObjects;
 using Shouldly;
 
 namespace SeroGlint.DotNet.Tests.TestClasses.Extensions
@@ -127,6 +128,26 @@ namespace SeroGlint.DotNet.Tests.TestClasses.Extensions
         {
             var result = input.ToNLogArchivePeriod();
             Assert.Equal(expected, result);
+        }
+
+        [Theory]
+        [InlineData(LoggingEventId.None)]
+        [InlineData(LoggingEventId.ReusingExistingPipe)]
+        [InlineData(LoggingEventId.ServerNotRunning)]
+        [InlineData(LoggingEventId.DisposingExistingPipe)]
+        public void Enum_WhenGettingValue_ShouldReturnIntegerValue(LoggingEventId input)
+        {
+            var testValue = input.GetValue();
+            var confirmedValue = (int)input;
+
+            testValue.ShouldBeEquivalentTo(confirmedValue);
+        }
+
+        [Fact]
+        public void Enum_WhenGettingValueFromInvalidEnum_ShouldReturnNegativeOne()
+        {
+            var testValue = SampleLongEnum.ValueOne.GetValue();
+            testValue.ShouldBe(-1);
         }
     }
 }

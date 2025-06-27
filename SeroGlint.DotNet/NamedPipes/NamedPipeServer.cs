@@ -18,7 +18,7 @@ namespace SeroGlint.DotNet.NamedPipes
     /// </summary>
     public class NamedPipeServer : INamedPipeServer
     {
-        private IPipeServerStreamWrapper _pipeServerStreamWrapper; 
+        private IPipeServerStreamWrapper _pipeServerStreamWrapper;
 
         public Guid Id { get; private set; } = Guid.NewGuid();
         public bool IsListening => _pipeServerStreamWrapper?.IsListening ?? false;
@@ -38,7 +38,7 @@ namespace SeroGlint.DotNet.NamedPipes
         {
             if (!IsListening)
             {
-                Configuration.Logger.LogInformation(new EventId(80862), "Server is not running. No need to stop.");
+                Configuration.Logger.LogInformation(LoggingEventId.ServerNotRunning.GetValue(), LoggingEventId.ServerNotRunning.GetDescription());
                 return;
             }
 
@@ -68,7 +68,7 @@ namespace SeroGlint.DotNet.NamedPipes
             {
                 if (_pipeServerStreamWrapper?.IsConnected == false)
                 {
-                    Configuration.Logger.LogInformation(new EventId(65845), "Disposing existing pipe server stream wrapper for '{PipeName}'", Configuration.PipeName);
+                    Configuration.Logger.LogInformation(LoggingEventId.DisposingExistingPipe.GetValue(), "Disposing existing pipe server stream wrapper for '{PipeName}'", Configuration.PipeName);
                     _pipeServerStreamWrapper?.Dispose();
                 }
 
@@ -138,34 +138,12 @@ namespace SeroGlint.DotNet.NamedPipes
 
         internal PipeEnvelope<TTargetType> ProcessReceivedMessage<TTargetType>(int bytesRead, byte[] buffer)
         {
-            if (bytesRead <= 0)
-            {
-                Configuration.Logger.LogInformation("No bytes read from pipe. Exiting message handling.");
-                return null;
-            }
-
-            try
+            if (bytesRead > 0)
             {
                 return IngestMessage<TTargetType>(bytesRead, buffer);
             }
-            catch (Exception ex)
-            {
-                var errorMessage = "Error parsing message from pipe";
-                Configuration.Logger.LogTrace(ex, errorMessage);
 
-                var envelope = new PipeEnvelope<dynamic>
-                {
-                    Payload = $"{errorMessage}: {ex.Message}"
-                };
-
-                ResponseRequested?.Invoke(this,
-                    new PipeResponseRequestedEventArgs(
-                    Guid.Empty,
-                    envelope,
-                    _pipeServerStreamWrapper.ServerStream));
-            }
-
-            Configuration.Logger.LogWarning("Failed to process message from pipe.");
+            Configuration.Logger.LogInformation("No bytes read from pipe. Exiting message handling.");
             return null;
         }
 

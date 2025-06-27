@@ -4,9 +4,9 @@ using RegressionTestHarness.Objects;
 using RegressionTestHarness.Utilities;
 using SeroGlint.DotNet.Extensions;
 using SeroGlint.DotNet.NamedPipes;
-using SeroGlint.DotNet.SecurityUtilities;
 using SeroGlint.DotNet.NamedPipes.EventArguments;
 using SeroGlint.DotNet.NamedPipes.Objects;
+using SeroGlint.DotNet.Security;
 
 namespace RegressionTestHarness.Pages
 {

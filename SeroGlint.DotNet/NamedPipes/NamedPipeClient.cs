@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO.Pipes;
 using System.Text;
 using System.Threading.Tasks;
@@ -43,7 +44,7 @@ namespace SeroGlint.DotNet.NamedPipes
             var serializedEnvelope = PrepareMessage(message);
             var client = EstablishClientStream();
 
-            var sendResult = await SendThroughPipe(client, serializedEnvelope);
+            var sendResult = await WriteToStream(client, serializedEnvelope);
             _logger.LogInformation(sendResult);
 
             var response = await ParseResponse(client);
@@ -81,21 +82,6 @@ namespace SeroGlint.DotNet.NamedPipes
             }
         }
 
-        private async Task<string> SendThroughPipe(IPipeClientStreamWrapper client, byte[] serializedEnvelope)
-        {
-            try
-            {
-                await WriteToStream(client, serializedEnvelope);
-                return "Message sent.";
-            }
-            catch (Exception ex)
-            {
-                var message = $"Error occurred sending on pipe {Configuration.PipeName}";
-                _logger.LogError(ex, message);
-                return $"{message}: {ex.Message}";
-            }
-        }
-
         internal async Task<string> RetrieveResponse(IPipeClientStreamWrapper client)
         {
             var buffer = new byte[4096];
@@ -122,7 +108,7 @@ namespace SeroGlint.DotNet.NamedPipes
             return Encoding.UTF8.GetString(responseBytes);
         }
 
-        private async Task WriteToStream(IPipeClientStreamWrapper client, byte[] serializedEnvelope)
+        private async Task<string> WriteToStream(IPipeClientStreamWrapper client, byte[] serializedEnvelope)
         {
             try
             {
@@ -139,11 +125,14 @@ namespace SeroGlint.DotNet.NamedPipes
                     Configuration.CancellationTokenSource.Token);
 
                 await client.FlushAsync(Configuration.CancellationTokenSource.Token);
+                return "Message sent.";
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error writing to pipe {Configuration.PipeName} on server {Configuration.ServerName}");
+                _logger.LogError(LoggingEventId.WritePipeError.GetValue(), ex, $"Error writing to pipe {Configuration.PipeName} on server {Configuration.ServerName}");
             }
+
+            return "Could not send message from client. An error occurred.";
         }
 
         private byte[] PrepareMessage<T>(IPipeEnvelope<T> message)
@@ -165,8 +154,7 @@ namespace SeroGlint.DotNet.NamedPipes
         {
             if (_pipeClientStreamWrapper != null)
             {
-                _logger.LogInformation(
-                    new EventId(80841, "Event Id for testing purposes only"), 
+                _logger.LogInformation(LoggingEventId.ReusingExistingPipe.GetValue(),
                     message: $"Reusing existing client stream (ID: {_pipeClientStreamWrapper.Id})");
 
                 return _pipeClientStreamWrapper;

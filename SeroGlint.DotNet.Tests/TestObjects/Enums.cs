@@ -4,9 +4,12 @@ namespace SeroGlint.DotNet.Tests.TestObjects;
 
 public enum SampleEnum
 {
-    [Description("First Option")]
-    ValueOne,
+    [Description("First Option")] 
+    ValueOne
+}
 
-    [Description("Second Option")]
-    ValueTwo
+public enum SampleLongEnum : long
+{
+    [Description("For conversion failure")]
+    ValueOne = (long)int.MaxValue + 1
 }

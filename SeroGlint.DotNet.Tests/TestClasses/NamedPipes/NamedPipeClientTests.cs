@@ -1,11 +1,12 @@
 ﻿using System.Text;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using SeroGlint.DotNet.Extensions;
 using SeroGlint.DotNet.NamedPipes;
 using SeroGlint.DotNet.NamedPipes.Interfaces;
 using SeroGlint.DotNet.NamedPipes.Objects;
-using SeroGlint.DotNet.SecurityUtilities;
-using SeroGlint.DotNet.SecurityUtilities.SecurityInterfaces;
+using SeroGlint.DotNet.Security;
+using SeroGlint.DotNet.Security.Interfaces;
 using SeroGlint.DotNet.Tests.TestClasses.NamedPipes.TestObjects;
 using SeroGlint.DotNet.Tests.TestObjects;
 using SeroGlint.DotNet.Tests.Utilities;
@@ -338,7 +339,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             _logger
                 .When(x => x.Log(
                     LogLevel.Information,
-                    80841,
+                    LoggingEventId.ReusingExistingPipe.GetValue(),
                     Do<object>(state => capturedMessage = state.ToString()),
                     Any<Exception>(),
                     Any<Func<object, Exception, string>>()!))
@@ -353,6 +354,47 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             // Assert
             capturedMessage.ShouldContain("Reusing existing client");
             capturedMessage.ShouldContain(guid.ToString());
+        }
+
+        [Fact]
+        public async Task SendThroughPipe_WhenWriteAsyncThrows_Returns_ErrorMessage()
+        {
+            // Arrange
+            var cfg = Substitute.For<INamedPipeConfiguration>();
+            cfg.PipeName.Returns("mypipe");
+            cfg.ServerName.Returns("myserver");
+            cfg.CancellationTokenSource.Returns(new CancellationTokenSource(3000));
+
+            var logger = Substitute.For<ILogger>();
+            var wrapper = Substitute.For<IPipeClientStreamWrapper>();
+            wrapper.IsConnected.Returns(true);
+            wrapper
+                .When(w => w.WriteAsync(
+                    Any<byte[]>(), Any<int>(), Any<int>(), Any<CancellationToken>()))
+                .Do(_ => throw new IOException("Fail the send for testing purposes"));
+
+            logger
+                .When(x => x.Log(
+                    LogLevel.Error,
+                    Is<EventId>(e => e.Id == LoggingEventId.WritePipeError.GetValue()),
+                    Any<object>(),
+                    Any<Exception>(),
+                    Any<Func<object, Exception, string>>()!))
+                .Do(ci => { });
+
+            var client = new NamedPipeClient(cfg, logger, wrapper);
+            var envelope = new PipeEnvelope<object>(_logger) { Payload = new { } };
+
+            // Act
+            await client.SendAsync(envelope);
+
+            // Assert
+            logger.Received(1).Log(
+                LogLevel.Error,
+                LoggingEventId.WritePipeError.GetValue(),
+                Is<object>(state => state.ToString()!.Contains("Error writing to pipe mypipe")),
+                Is<IOException>(ex => ex.Message == "Fail the send for testing purposes"),
+                Any<Func<object, Exception, string>>()!);
         }
     }
 }

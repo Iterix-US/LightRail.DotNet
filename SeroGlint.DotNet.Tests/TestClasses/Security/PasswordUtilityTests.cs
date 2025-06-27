@@ -1,5 +1,5 @@
 using System.Text;
-using SeroGlint.DotNet.SecurityUtilities;
+using SeroGlint.DotNet.Security;
 using Shouldly;
 
 namespace SeroGlint.DotNet.Tests.TestClasses.Security

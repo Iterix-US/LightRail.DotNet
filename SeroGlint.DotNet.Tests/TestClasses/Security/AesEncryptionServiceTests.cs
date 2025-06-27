@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using SeroGlint.DotNet.SecurityUtilities;
+using SeroGlint.DotNet.Security;
 
 namespace SeroGlint.DotNet.Tests.TestClasses.Security
 {
