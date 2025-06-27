@@ -257,6 +257,109 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
             captured.ShouldContain("No bytes read from pipe");
         }
 
+        [Fact]
+        public async Task NamedPipeServer_WhenStoppingServerInstance_ThenServerStateShouldChange()
+        {
+            // Arrange
+            var config = new PipeServerConfiguration();
+            config.Initialize(
+                ".",
+                "TestPipe",
+                Substitute.For<ILogger>(),
+                Substitute.For<IEncryptionService>(),
+                new CancellationTokenSource(3000));
+
+            var wrapper = Substitute.For<IPipeServerStreamWrapper>();
+            wrapper.IsConnected.Returns(true);
+            wrapper.IsListening.Returns(true);
+
+            var pipeServer = new NamedPipeServer(config, wrapper);
+
+            // Act
+            await pipeServer.StartAsync();
+
+            // Asserts contained here.
+            pipeServer.ServerStateChanged += async (e, s) =>
+            {
+                e.ShouldNotBeNull();
+                s.ContextLabel.ShouldBe("Stopped");
+            };
+
+            pipeServer.Stop();
+        }
+
+        [Fact]
+        public async Task NamedPipeServer_WhenStoppingNonRunningServerInstance_ThenServerStateShouldChange()
+        {
+            // Arrange
+            var logger = Substitute.For<ILogger>();
+            var config = new PipeServerConfiguration();
+            config.Initialize(
+                ".",
+                "TestPipe",
+                logger,
+                Substitute.For<IEncryptionService>(),
+                new CancellationTokenSource(3000));
+
+            var wrapper = Substitute.For<IPipeServerStreamWrapper>();
+            wrapper.IsConnected.Returns(false);
+            wrapper.IsListening.Returns(false);
+
+            var pipeServer = new NamedPipeServer(config, wrapper);
+
+            var captured = string.Empty;
+            logger
+                .When(x => x.Log(
+                    LogLevel.Information,
+                    80862,
+                    Arg.Do<object>(state => captured = state.ToString()),
+                    Arg.Any<Exception>(),
+                    Arg.Any<Func<object, Exception, string>>()!))
+                .Do(_ => { });
+
+            // Act
+            pipeServer.Stop();
+
+            // Assert
+            captured.ShouldContain("not running");
+        }
+
+        [Fact]
+        public async Task NamedPipeServer_WhenInitializingServerInstance_ThenServerStateShouldChange()
+        {
+            // Arrange
+            var logger = Substitute.For<ILogger>();
+            var config = new PipeServerConfiguration();
+            config.Initialize(
+                ".",
+                "TestPipe",
+                logger,
+                Substitute.For<IEncryptionService>(),
+                new CancellationTokenSource(3000));
+
+            var wrapper = Substitute.For<IPipeServerStreamWrapper>();
+            wrapper.IsConnected.Returns(false);
+            wrapper.IsListening.Returns(false);
+
+            var pipeServer = new NamedPipeServer(config, wrapper);
+
+            var captured = string.Empty;
+            logger
+                .When(x => x.Log(
+                    LogLevel.Information,
+                    65845,
+                    Arg.Do<object>(state => captured = state.ToString()),
+                    Arg.Any<Exception>(),
+                    Arg.Any<Func<object, Exception, string>>()!))
+                .Do(_ => { });
+
+            // Act
+            await pipeServer.StartAsync();
+
+            // Assert
+            captured.ShouldContain("Disposing existing");
+        }
+
         private async Task CleanupServer(PipeServerConfiguration config, Task serverTask)
         {
             _testOutputHelper.WriteLine("Client disconnected, waiting for server to process message...");

@@ -38,7 +38,7 @@ namespace SeroGlint.DotNet.NamedPipes
         {
             if (!IsListening)
             {
-                Configuration.Logger.LogInformation("Server is not running. No need to stop.");
+                Configuration.Logger.LogInformation(new EventId(80862), "Server is not running. No need to stop.");
                 return;
             }
 
@@ -68,7 +68,7 @@ namespace SeroGlint.DotNet.NamedPipes
             {
                 if (_pipeServerStreamWrapper?.IsConnected == false)
                 {
-                    Configuration.Logger.LogInformation("Disposing existing pipe server stream wrapper for '{PipeName}'", Configuration.PipeName);
+                    Configuration.Logger.LogInformation(new EventId(65845), "Disposing existing pipe server stream wrapper for '{PipeName}'", Configuration.PipeName);
                     _pipeServerStreamWrapper?.Dispose();
                 }
 
@@ -165,6 +165,7 @@ namespace SeroGlint.DotNet.NamedPipes
                     _pipeServerStreamWrapper.ServerStream));
             }
 
+            Configuration.Logger.LogWarning("Failed to process message from pipe.");
             return null;
         }
 

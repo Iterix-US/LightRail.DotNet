@@ -155,7 +155,8 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
 
             // Act & Assert
             await client.SendAsync(envelope);
-            capturedMessage.ShouldContain("received from server");
+            capturedMessage.ShouldContain("received");
+            capturedMessage.ShouldContain("response");
             await serverTask;
         }
 

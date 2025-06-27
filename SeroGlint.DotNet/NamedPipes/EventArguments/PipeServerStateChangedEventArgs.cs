@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using SeroGlint.DotNet.NamedPipes.Interfaces;
 
 namespace SeroGlint.DotNet.NamedPipes.EventArguments
 {
+    [ExcludeFromCodeCoverage] // Excluding because there's no actual logic here.
     public class PipeServerStateChangedEventArgs
     {
         public string ContextLabel { get; private set; }
