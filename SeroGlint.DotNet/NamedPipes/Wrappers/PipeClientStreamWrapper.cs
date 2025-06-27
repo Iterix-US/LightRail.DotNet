@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO.Pipes;
 using System.Threading;
 using System.Threading.Tasks;
-using SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces;
+using SeroGlint.DotNet.NamedPipes.Interfaces;
 
 namespace SeroGlint.DotNet.NamedPipes.Wrappers
 {

@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace SeroGlint.DotNet.NamedPipes.Packaging
+namespace SeroGlint.DotNet.NamedPipes.Objects
 {
     /// <summary>
     /// Configuration class for a named pipe client.

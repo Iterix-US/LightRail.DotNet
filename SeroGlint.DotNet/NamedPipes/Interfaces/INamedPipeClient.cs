@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces
+namespace SeroGlint.DotNet.NamedPipes.Interfaces
 {
     /// <summary>
     /// Interface for a named pipe client that sends messages to a named pipe server.

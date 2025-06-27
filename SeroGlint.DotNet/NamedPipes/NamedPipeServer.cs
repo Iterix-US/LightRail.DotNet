@@ -8,8 +8,7 @@ using SeroGlint.DotNet.Extensions;
 using SeroGlint.DotNet.NamedPipes.Delegates;
 using SeroGlint.DotNet.NamedPipes.EventArguments;
 using SeroGlint.DotNet.NamedPipes.Interfaces;
-using SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces;
-using SeroGlint.DotNet.NamedPipes.Packaging;
+using SeroGlint.DotNet.NamedPipes.Objects;
 using SeroGlint.DotNet.NamedPipes.Wrappers;
 
 namespace SeroGlint.DotNet.NamedPipes

@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using SeroGlint.DotNet.SecurityUtilities.SecurityInterfaces;
 
-namespace SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces
+namespace SeroGlint.DotNet.NamedPipes.Interfaces
 {
     /// <summary>
     /// Interface for configuring named pipe servers, providing properties and methods for setup.

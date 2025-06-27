@@ -1,5 +1,5 @@
 ﻿using System;
-using SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces;
+using SeroGlint.DotNet.NamedPipes.Interfaces;
 
 namespace SeroGlint.DotNet.NamedPipes.EventArguments
 {

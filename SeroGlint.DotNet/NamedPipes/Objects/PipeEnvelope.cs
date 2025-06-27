@@ -3,10 +3,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using SeroGlint.DotNet.Extensions;
-using SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces;
+using SeroGlint.DotNet.NamedPipes.Interfaces;
+
 // ReSharper disable MethodOverloadWithOptionalParameter
 
-namespace SeroGlint.DotNet.NamedPipes.Packaging
+namespace SeroGlint.DotNet.NamedPipes.Objects
 {
     public class PipeEnvelope<T> : IPipeEnvelope<T>
     {

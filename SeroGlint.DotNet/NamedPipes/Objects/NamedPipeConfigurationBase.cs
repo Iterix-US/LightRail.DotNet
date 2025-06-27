@@ -2,10 +2,10 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using Microsoft.Extensions.Logging;
-using SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces;
+using SeroGlint.DotNet.NamedPipes.Interfaces;
 using SeroGlint.DotNet.SecurityUtilities.SecurityInterfaces;
 
-namespace SeroGlint.DotNet.NamedPipes.Packaging
+namespace SeroGlint.DotNet.NamedPipes.Objects
 {
     /// <summary>
     /// Base class for configuring named pipe servers, providing default implementations and properties.

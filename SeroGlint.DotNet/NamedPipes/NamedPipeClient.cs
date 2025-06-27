@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SeroGlint.DotNet.Extensions;
-using SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces;
+using SeroGlint.DotNet.NamedPipes.Interfaces;
 using SeroGlint.DotNet.NamedPipes.Wrappers;
 
 namespace SeroGlint.DotNet.NamedPipes
@@ -57,6 +57,7 @@ namespace SeroGlint.DotNet.NamedPipes
             if (!_pipeClientStreamWrapper.IsConnected)
             {
                 Configuration.Logger.LogInformation("Client is not connected");
+                return;
             }
 
             Configuration.Logger.LogInformation("Client is disconnected");
@@ -164,6 +165,10 @@ namespace SeroGlint.DotNet.NamedPipes
         {
             if (_pipeClientStreamWrapper != null)
             {
+                _logger.LogInformation(
+                    new EventId(80841, "Event Id for testing purposes only"), 
+                    message: $"Reusing existing client stream (ID: {_pipeClientStreamWrapper.Id})");
+
                 return _pipeClientStreamWrapper;
             }
 

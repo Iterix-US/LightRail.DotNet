@@ -2,8 +2,8 @@
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using SeroGlint.DotNet.NamedPipes;
-using SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces;
-using SeroGlint.DotNet.NamedPipes.Packaging;
+using SeroGlint.DotNet.NamedPipes.Interfaces;
+using SeroGlint.DotNet.NamedPipes.Objects;
 using SeroGlint.DotNet.SecurityUtilities;
 using SeroGlint.DotNet.SecurityUtilities.SecurityInterfaces;
 using SeroGlint.DotNet.Tests.TestClasses.NamedPipes.TestObjects;
@@ -155,7 +155,7 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
 
             // Act & Assert
             await client.SendAsync(envelope);
-            capturedMessage.ShouldContain("received response from server");
+            capturedMessage.ShouldContain("received from server");
             await serverTask;
         }
 
@@ -267,6 +267,91 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
 
             // Assert
             result.ShouldBe(Encoding.UTF8.GetString(translatedOriginalBytes));
+        }
+
+        [Fact]
+        public void NamedPipeClient_WhenDisconnecting_ThenDisposeStreamWrapper()
+        {
+            // Arrange
+            var wrapper = Substitute.For<IPipeClientStreamWrapper>();
+            wrapper.IsConnected.Returns(true);
+            var config = Substitute.For<INamedPipeConfiguration>();
+            config.CancellationTokenSource.Returns(new CancellationTokenSource(3000));
+            config.ServerName.Returns("TestServer");
+            config.PipeName.Returns("TestPipe");
+            config.EncryptionService.Returns(Substitute.For<IEncryptionService>());
+            var client = new NamedPipeClient(config, _logger, wrapper);
+
+            // Act
+            client.Disconnect();
+
+            // Assert
+            wrapper.Received(1).Dispose();
+        }
+
+        [Fact]
+        public void NamedPipeClient_WhenNotConnected_ThenDoesNotDisposeStreamWrapper()
+        {
+            // Arrange
+            var wrapper = Substitute.For<IPipeClientStreamWrapper>();
+            wrapper.IsConnected.Returns(false);
+            var config = Substitute.For<INamedPipeConfiguration>();
+            config.CancellationTokenSource.Returns(new CancellationTokenSource(3000));
+            config.ServerName.Returns("TestServer");
+            config.PipeName.Returns("TestPipe");
+            config.EncryptionService.Returns(Substitute.For<IEncryptionService>());
+            var client = new NamedPipeClient(config, _logger, wrapper);
+
+            // Act
+            client.Disconnect();
+
+            // Assert
+            wrapper.DidNotReceive().Dispose();
+        }
+
+        [Fact]
+        public async Task NamedPipeClient_WhenEstablishingClientStreamWithNotNullWrapper_ThenUseExistingWrapper()
+        {
+            // Arrange
+            var guid = Guid.NewGuid();
+            var wrapper = Substitute.For<IPipeClientStreamWrapper>();
+            wrapper.Id.Returns(guid);
+            wrapper.IsConnected.Returns(false);
+
+            var config = new PipeServerConfiguration();
+            config.Initialize(
+                "TestServer", 
+                "TestPipe", 
+                _logger, 
+                new AesEncryptionService(AesEncryptionService.GenerateKey(), _logger), 
+                new CancellationTokenSource(3000));
+            
+            var server = Substitute.For<INamedPipeServer>();
+            server.Configuration.Returns(config);
+            server.IsListening.Returns(true);
+            server.StartAsync().Returns(Task.CompletedTask);
+
+            var client = new NamedPipeClient(config, _logger, wrapper);
+
+            var capturedMessage = string.Empty;
+            _logger
+                .When(x => x.Log(
+                    LogLevel.Information,
+                    80841,
+                    Do<object>(state => capturedMessage = state.ToString()),
+                    Any<Exception>(),
+                    Any<Func<object, Exception, string>>()!))
+                .Do(_ => { });
+
+            // Act
+            await client.SendAsync(new PipeEnvelope<TestableNamedPipeClient>(_logger)
+            {
+                Payload = new TestableNamedPipeClient(config, _logger)
+            });
+
+            // Assert
+            capturedMessage.ShouldContain("Reusing existing client");
+            capturedMessage.ShouldContain(guid.ToString());
         }
     }
 }

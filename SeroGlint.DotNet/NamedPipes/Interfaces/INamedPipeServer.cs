@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using SeroGlint.DotNet.NamedPipes.Delegates;
-using SeroGlint.DotNet.NamedPipes.Packaging;
+using SeroGlint.DotNet.NamedPipes.Objects;
 
-namespace SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces
+namespace SeroGlint.DotNet.NamedPipes.Interfaces
 {
     /// <summary>
     /// Interface for a named pipe server that listens for messages and processes them asynchronously.

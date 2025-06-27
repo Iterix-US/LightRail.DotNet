@@ -5,7 +5,7 @@ using NSubstitute;
 using SeroGlint.DotNet.Extensions;
 using SeroGlint.DotNet.NamedPipes;
 using SeroGlint.DotNet.NamedPipes.Interfaces;
-using SeroGlint.DotNet.NamedPipes.Packaging;
+using SeroGlint.DotNet.NamedPipes.Objects;
 using SeroGlint.DotNet.SecurityUtilities.SecurityInterfaces;
 using SeroGlint.DotNet.Tests.TestObjects;
 using Shouldly;
@@ -185,10 +185,15 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
         public async Task NamedPipeServer_WhenSendResponseAsyncGivenNullStream_ThenReturnsWithoutWriting()
         {
             // Arrange
+            var logger = Substitute.For<ILogger>();
+            var config = new PipeServerConfiguration
+            {
+                Logger = logger
+            };
             var envelope = new PipeEnvelope<dynamic> { Payload = "No-op" };
 
             // Act
-            var namedPipeServer = new NamedPipeServer(new PipeServerConfiguration());
+            var namedPipeServer = new NamedPipeServer(config);
             var exception = await Record.ExceptionAsync(() =>
                 namedPipeServer.SendResponseAsync(envelope.MessageId));
 
@@ -200,7 +205,13 @@ namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes
         public async Task NamedPipeServer_WhenSendResponseAsyncGivenDisconnectedStream_ThenReturnsWithoutWriting()
         {
             // Arrange
-            var namedPipeServer = new NamedPipeServer(new PipeServerConfiguration());
+            var logger = Substitute.For<ILogger>();
+            var config = new PipeServerConfiguration
+            {
+                Logger = logger
+            };
+
+            var namedPipeServer = new NamedPipeServer(config);
             var stream = Substitute.For<IPipeServerStreamWrapper>();
             stream.IsConnected.Returns(false);
 

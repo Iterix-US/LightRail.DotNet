@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using SeroGlint.DotNet.NamedPipes;
-using SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces;
+using SeroGlint.DotNet.NamedPipes.Interfaces;
 
 namespace SeroGlint.DotNet.Tests.TestClasses.NamedPipes.TestObjects
 {

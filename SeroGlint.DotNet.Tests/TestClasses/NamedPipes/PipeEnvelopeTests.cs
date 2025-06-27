@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using SeroGlint.DotNet.Extensions;
-using SeroGlint.DotNet.NamedPipes.Packaging;
+using SeroGlint.DotNet.NamedPipes.Objects;
 using SeroGlint.DotNet.Tests.TestObjects;
 using Shouldly;
 

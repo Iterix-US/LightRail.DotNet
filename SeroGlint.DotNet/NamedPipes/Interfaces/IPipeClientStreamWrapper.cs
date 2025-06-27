@@ -3,7 +3,7 @@ using System.IO.Pipes;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces
+namespace SeroGlint.DotNet.NamedPipes.Interfaces
 {
     public interface IPipeClientStreamWrapper : IDisposable
     {

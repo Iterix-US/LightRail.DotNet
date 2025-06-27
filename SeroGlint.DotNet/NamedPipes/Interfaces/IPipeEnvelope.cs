@@ -1,6 +1,6 @@
-﻿using SeroGlint.DotNet.NamedPipes.Packaging;
+﻿using SeroGlint.DotNet.NamedPipes.Objects;
 
-namespace SeroGlint.DotNet.NamedPipes.NamedPipeInterfaces
+namespace SeroGlint.DotNet.NamedPipes.Interfaces
 {
     public interface IPipeEnvelope<T>
     {

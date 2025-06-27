@@ -1,7 +1,7 @@
-﻿using SeroGlint.DotNet.NamedPipes.Packaging;
-using System;
+﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Pipes;
+using SeroGlint.DotNet.NamedPipes.Objects;
 
 namespace SeroGlint.DotNet.NamedPipes.EventArguments
 {
