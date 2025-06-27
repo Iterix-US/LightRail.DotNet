@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Reflection;
-using SeroGlint.DotNet.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using SeroGlint.DotNet.Abstractions;
 using SeroGlint.DotNet.FileManagement;
 
 namespace SeroGlint.DotNet.Logging

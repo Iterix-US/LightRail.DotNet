@@ -2,12 +2,12 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
-using SeroGlint.DotNet.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using SeroGlint.DotNet.Abstractions;
+using SeroGlint.DotNet.Extensions;
 using SeroGlint.DotNet.FileManagement;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
