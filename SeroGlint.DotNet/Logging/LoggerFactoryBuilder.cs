@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Reflection;
-using SeroGlint.DotNet.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using SeroGlint.DotNet.Abstractions;
+using SeroGlint.DotNet.FileManagement;
 
 namespace SeroGlint.DotNet.Logging
 {
@@ -24,7 +25,13 @@ namespace SeroGlint.DotNet.Logging
         private string _outputTemplate = "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}{Exception}";
         private string _category = Assembly.GetExecutingAssembly().GetName().Name ?? "AppLogger";
         private IConfiguration _configuration;
-        protected IDirectoryManagement FileManager { get; }
+
+        public IDirectoryManagement FileManager { get; }
+
+        public LoggerFactoryBuilder(IDirectoryManagement fileManager = null)
+        {
+            FileManager = fileManager ?? new DirectoryManagementWrapper();
+        }
 
         /// <summary>
         /// Initializes a new instance of the LoggerFactoryBuilder class.
@@ -141,7 +148,7 @@ namespace SeroGlint.DotNet.Logging
         /// <returns></returns>
         public ILogger BuildSerilog()
         {
-            var builder = new SerilogBuilder()
+            var builder = new SerilogBuilder(FileManager)
                 .WithMinimumLevel(_logLevel)
                 .WithRollingInterval(_rollingInterval)
                 .WithFileSizeLimit(_fileSizeLimit)
@@ -167,7 +174,7 @@ namespace SeroGlint.DotNet.Logging
         /// <returns></returns>
         public ILogger BuildNLog()
         {
-            var builder = new NLogBuilder()
+            var builder = new NLogBuilder(FileManager)
                 .WithMinimumLevel(_logLevel)
                 .WithRollingInterval(_rollingInterval)
                 .WithFileSizeLimit(_fileSizeLimit)

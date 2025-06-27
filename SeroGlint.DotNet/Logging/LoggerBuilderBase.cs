@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
-using SeroGlint.DotNet.Abstractions;
-using SeroGlint.DotNet.Logging.LoggerInterfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SeroGlint.DotNet.Abstractions;
+using SeroGlint.DotNet.Logging.LoggerInterfaces;
 
 namespace SeroGlint.DotNet.Logging
 {
@@ -46,7 +45,7 @@ namespace SeroGlint.DotNet.Logging
         /// <summary>
         /// The file manager used for handling file operations. This is useful for abstracting file system interactions, such as checking if a file exists or creating directories.
         /// </summary>
-        public IDirectoryManagement FileManager { get; }
+        public IDirectoryManagement FileManager { get; internal set; }
 
         /// <summary>
         /// Indicates whether the logger has been built. This is used to prevent multiple builds of the same logger configuration.

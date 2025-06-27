@@ -10,7 +10,8 @@ namespace SeroGlint.DotNet.Abstractions
         string WriteAllText(string path, string contents);
         string GetFullPath(string path);
         string GetDirectoryName(string filePath);
-        Stream Create(string filePath);
+        Stream Create(string filePath, FileMode fileMode = FileMode.Create, FileAccess fileAccess = FileAccess.ReadWrite, FileShare fileShare = FileShare.None);
         DirectoryInfo CreateDirectory(string path);
+        bool DirectoryExists(string logFilePath);
     }
 }

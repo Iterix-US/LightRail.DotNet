@@ -2,7 +2,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
-using SeroGlint.DotNet.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -10,6 +9,9 @@ using NLog;
 using NLog.Config;
 using NLog.Extensions.Logging;
 using NLog.Targets;
+using SeroGlint.DotNet.Abstractions;
+using SeroGlint.DotNet.Extensions;
+using SeroGlint.DotNet.FileManagement;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace SeroGlint.DotNet.Logging
@@ -18,6 +20,11 @@ namespace SeroGlint.DotNet.Logging
     [ExcludeFromCodeCoverage]
     public class NLogBuilder : LoggerBuilderBase<NLogBuilder, ILogger, LoggingConfiguration>
     {
+        public NLogBuilder(IDirectoryManagement fileManager)
+        {
+            FileManager = fileManager ?? new DirectoryManagementWrapper();
+        }
+
         public override LoggingConfiguration Configuration { get; internal set; } = new LoggingConfiguration();
 
         public override NLogBuilder OutputToFile(bool createLogPath = false, string logPath = null, string logName = null, string logExtension = null)
