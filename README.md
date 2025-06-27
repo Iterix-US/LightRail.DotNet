@@ -45,7 +45,6 @@ These packages are required when using `SeroGlint.DotNet`:
 | `System.Security.Cryptography.Algorithms`| 4.3.1   | Enables AES encryption in secure communication                         |
 | `System.Text.Json`                       | 9.0.3   | JSON (de)serialization used across pipe messaging and utilities         |
 
-
 ## 🧪 Testing
 
 Unit tests are written using `xUnit` and `NSubstitute`, following the Arrange-Act-Assert pattern. Most components are fully mockable and testable due to interface abstractions.
