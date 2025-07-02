@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+	  <Title>SeroGlint.DotNet.Windows</Title>
+	  <Company>Iterix</Company>
+	  <Description>A Windows-specific extension to the SeroGlint.DotNet library</Description>
+	  <Copyright>Iterix 2025</Copyright>
+	  <PackageProjectUrl>https://github.com/Iterix-US/SeroGlint.DotNet</PackageProjectUrl>
+	  <PackageReadmeFile>README.md</PackageReadmeFile>
+	  <RepositoryUrl>https://github.com/Iterix-US/SeroGlint.DotNet</RepositoryUrl>
+	  <PackageTags>extensions;toolkit;expansion;dotnet;netstandard;windows;sero;glint;</PackageTags>
+	  <PackageLicenseFile>LICENSE</PackageLicenseFile>
+	  <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+	  <RepositoryType>git</RepositoryType>
+	  <Version>1.0.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
+    <PackageReference Include="SeroGlint.DotNet" Version="1.1.0" />
+  </ItemGroup>
+
+</Project>

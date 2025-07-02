@@ -1,31 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Title>SeroGlint.DotNet</Title>
-    <Company>Iterix</Company>
-    <Description>A powerful yet lightweight toolkit that simplifies, accelerates, and enhances your .NET development.</Description>
-    <Copyright>Iterix 2025</Copyright>
-    <PackageProjectUrl>https://github.com/Iterix-US/SeroGlint.DotNet</PackageProjectUrl>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <RepositoryUrl>https://github.com/Iterix-US/SeroGlint.DotNet</RepositoryUrl>
-    <PackageTags>extensions;toolkit;expansion;dotnet;netstandard;</PackageTags>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <RepositoryType>git</RepositoryType>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Title>SeroGlint.DotNet</Title>
+		<Company>Iterix</Company>
+		<Description>A powerful yet lightweight toolkit that simplifies, accelerates, and enhances your .NET development.</Description>
+		<Copyright>Iterix 2025</Copyright>
+		<PackageProjectUrl>https://github.com/Iterix-US/SeroGlint.DotNet</PackageProjectUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/Iterix-US/SeroGlint.DotNet</RepositoryUrl>
+		<PackageTags>extensions;toolkit;expansion;dotnet;netstandard;sero;glint;</PackageTags>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+		<RepositoryType>git</RepositoryType>
+		<Version>1.1.0</Version>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Include="..\LICENSE">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-    <None Include="..\README.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="..\LICENSE">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="..\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
 
 	<ItemGroup>
 		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
