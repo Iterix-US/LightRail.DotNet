@@ -105,4 +105,11 @@ namespace SeroGlint.DotNet
         [Description("Write Pipe Error")]
         WritePipeError = 48846
     }
+
+    public enum ToastInteractionType
+    {
+        Click,
+        ButtonClick,
+        Dismiss
+    }
 }
