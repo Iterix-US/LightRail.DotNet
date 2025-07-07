@@ -24,7 +24,7 @@ namespace SeroGlint.DotNet.Notifications.ToastControls
 
         public virtual void Contribute(IButtonToast toastContainer)
         {
-            _toastId = toastContainer.Id;
+            
         }
 
         public virtual void Click()
