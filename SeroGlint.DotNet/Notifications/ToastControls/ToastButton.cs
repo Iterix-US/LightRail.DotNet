@@ -1,29 +1,33 @@
 ﻿using System;
+using Microsoft.Extensions.Logging;
 using SeroGlint.DotNet.Extensions;
 using SeroGlint.DotNet.Notifications.Events;
 using SeroGlint.DotNet.Notifications.Interfaces;
 
 namespace SeroGlint.DotNet.Notifications.ToastControls
 {
-    public class ToastButton : IToastButton
+    public abstract class ToastButton : IToastButton
     {
         private string _toastId;
+
+        public ILogger Logger { get; }
         public string Text { get; }
         public Uri Uri { get; }
         public event ToastInteractionTriggered ToastButtonClicked;
 
-        public ToastButton(string buttonText, Uri uri = null)
+        protected ToastButton(ILogger logger, string buttonText, Uri uri = null)
         {
+            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             Text = buttonText;
             Uri = uri;
         }
 
-        public void Contribute(IButtonToast toastContainer)
+        public virtual void Contribute(IButtonToast toastContainer)
         {
             _toastId = toastContainer.Id;
         }
 
-        public void Click()
+        public virtual void Click()
         {
             ToastButtonClicked?.Invoke(this, new ToastInteractionTriggeredEventArgs
             {

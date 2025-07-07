@@ -1,8 +1,9 @@
-﻿using SeroGlint.DotNet.Windows.Registry.Windows.Interfaces;
+﻿using SeroGlint.DotNet.Windows.Registry.Interfaces;
+
 
 // ReSharper disable ConvertToAutoProperty
 
-namespace SeroGlint.DotNet.Windows.Registry.Windows
+namespace SeroGlint.DotNet.Windows.Registry
 {
     public class RegistryWrapper : IRegistryWrapper
     {

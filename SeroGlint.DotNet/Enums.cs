@@ -66,6 +66,9 @@ namespace SeroGlint.DotNet
         Hourly = 4
     }
 
+    /// <summary>
+    /// Represents the modes in which a pipe server can operate.
+    /// </summary>
     public enum PipeServerMode
     {
         [Description("Momentary")]
@@ -74,6 +77,9 @@ namespace SeroGlint.DotNet
         Perpetual
     }
 
+    /// <summary>
+    /// Represents the error codes used in the application to indicate various types of errors.
+    /// </summary>
     public enum Error
     {
         [Description("No Error")]
@@ -92,6 +98,9 @@ namespace SeroGlint.DotNet
         OperationFailed = 105,
     }
 
+    /// <summary>
+    /// Represents the event IDs used for logging various events in the application.
+    /// </summary>
     public enum LoggingEventId
     {
         [Description("")]
@@ -106,6 +115,9 @@ namespace SeroGlint.DotNet
         WritePipeError = 48846
     }
 
+    /// <summary>
+    /// Represents the type of interaction that triggered the toast event.
+    /// </summary>
     public enum ToastInteractionType
     {
         Click,

@@ -1,4 +1,4 @@
-﻿namespace SeroGlint.DotNet.Windows.Registry.Windows.Interfaces
+﻿namespace SeroGlint.DotNet.Windows.Registry.Interfaces
 {
     internal interface IRegistryWrapper
     {

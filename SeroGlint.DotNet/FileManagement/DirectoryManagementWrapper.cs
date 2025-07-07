@@ -22,6 +22,11 @@ namespace SeroGlint.DotNet.FileManagement
             _logger?.LogInformation("Disposing DirectoryManagementWrapper resources.");
         }
 
+        public string GetFileName(string path)
+        {
+            return Path.GetFileName(path);
+        }
+
         public bool Exists(string filePath)
         {
             if (string.IsNullOrWhiteSpace(filePath))

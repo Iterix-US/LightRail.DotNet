@@ -2,7 +2,7 @@
 using System.Collections;
 using Microsoft.Win32;
 
-namespace SeroGlint.DotNet.Windows.Registry.Windows.Interfaces
+namespace SeroGlint.DotNet.Windows.Registry.Interfaces
 {
     public interface IRegistryKey : IDisposable
     {

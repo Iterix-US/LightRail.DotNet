@@ -1,8 +1,8 @@
 ﻿using System.Collections;
 using Microsoft.Win32;
-using SeroGlint.DotNet.Windows.Registry.Windows.Interfaces;
+using SeroGlint.DotNet.Windows.Registry.Interfaces;
 
-namespace SeroGlint.DotNet.Windows.Registry.Windows
+namespace SeroGlint.DotNet.Windows.Registry
 {
     public class RegistryKeyWrapper : IRegistryKey
     {

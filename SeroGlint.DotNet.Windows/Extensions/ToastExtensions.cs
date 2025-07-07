@@ -5,7 +5,7 @@ namespace SeroGlint.DotNet.Windows.Extensions
 {
     public static class ToastExtensions
     {
-        public static ToastNotification ToToast(this IToastPayload payload)
+        public static ToastNotification ToToast(this IToast payload)
         {
             var payloadType = payload.GetType();
             if (payloadType.IsAssignableFrom(typeof(IProgressToast)))
@@ -26,17 +26,17 @@ namespace SeroGlint.DotNet.Windows.Extensions
             return default;
         }
 
-        private static ToastNotification ParseProgressToast(IToastPayload payload)
+        private static ToastNotification ParseProgressToast(IToast payload)
         {
             throw new System.NotImplementedException();
         }
 
-        private static ToastNotification ParseButtonToast(IToastPayload payload)
+        private static ToastNotification ParseButtonToast(IToast payload)
         {
             throw new System.NotImplementedException();
         }
 
-        private static ToastNotification ParseBasicToast(IToastPayload payload)
+        private static ToastNotification ParseBasicToast(IToast payload)
         {
             throw new System.NotImplementedException();
         }

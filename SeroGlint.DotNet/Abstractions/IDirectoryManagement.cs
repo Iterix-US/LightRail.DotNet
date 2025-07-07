@@ -6,6 +6,7 @@ namespace SeroGlint.DotNet.Abstractions
     public interface IDirectoryManagement : IDisposable
     {
         bool Exists(string filePath);
+        string GetFileName(string path);
         string ReadAllText(string filePath);
         string WriteAllText(string path, string contents);
         string GetFullPath(string path);
