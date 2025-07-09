@@ -10,7 +10,7 @@ namespace SeroGlint.DotNet.Notifications.Toasts
     /// Bread.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract class ToastBase<T> : IToast
+    public abstract class ToastBase<T> : IToastBase
     {
         public virtual ILogger Logger { get; private set; }
         public virtual string Id { get; private set; } = Guid.NewGuid().ToString();

@@ -1,6 +1,6 @@
 ﻿namespace SeroGlint.DotNet.Notifications.Interfaces
 {
-    public interface IBasicToast
+    public interface IBasicToast : IToast
     {
         /// <summary>
         /// Gets the body text of the toast, which provides additional information or context.

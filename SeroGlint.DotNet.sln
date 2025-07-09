@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegressionTestHarness", "Re
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeroGlint.DotNet.Windows", "SeroGlint.DotNet.Windows\SeroGlint.DotNet.Windows.csproj", "{D6290A56-CB5E-4755-A1F6-E85B8BE2BFC2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeroGlint.DotNet.ElevatedAgent", "SeroGlint.DotNet.ElevatedAgent\SeroGlint.DotNet.ElevatedAgent.csproj", "{476BDB9C-6140-4D76-A148-8C825660FABD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,10 @@ Global
 		{D6290A56-CB5E-4755-A1F6-E85B8BE2BFC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D6290A56-CB5E-4755-A1F6-E85B8BE2BFC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D6290A56-CB5E-4755-A1F6-E85B8BE2BFC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{476BDB9C-6140-4D76-A148-8C825660FABD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{476BDB9C-6140-4D76-A148-8C825660FABD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{476BDB9C-6140-4D76-A148-8C825660FABD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{476BDB9C-6140-4D76-A148-8C825660FABD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

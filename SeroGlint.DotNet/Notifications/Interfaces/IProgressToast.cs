@@ -2,7 +2,7 @@
 
 namespace SeroGlint.DotNet.Notifications.Interfaces
 {
-    public interface IProgressToast
+    public interface IProgressToast : IToast
     {
         /// <summary>
         /// Gets the logger instance for logging events related to this progress toast.
