@@ -19,7 +19,13 @@ namespace SeroGlint.DotNet.NamedPipes
 
         internal INamedPipeConfiguration Configuration { get; }
 
+        public string PipeName => Configuration.PipeName;
         public bool IsConnected => _pipeClientStreamWrapper?.IsConnected ?? false;
+
+        public NamedPipeClient()
+        {
+            
+        }
 
         public NamedPipeClient(INamedPipeConfiguration configuration, ILogger logger,
             IPipeClientStreamWrapper pipeClientStreamWrapper = null)

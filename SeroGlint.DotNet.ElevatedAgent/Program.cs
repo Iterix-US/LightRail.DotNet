@@ -1,27 +1,23 @@
-﻿using System.Diagnostics;
-using Microsoft.Extensions.Logging;
-using SeroGlint.DotNet.ConsoleUtilities;
+﻿using Microsoft.Extensions.Logging;
 using SeroGlint.DotNet.Extensions;
 using SeroGlint.DotNet.Logging;
 using SeroGlint.DotNet.NamedPipes;
+using SeroGlint.DotNet.NamedPipes.Interfaces;
 using SeroGlint.DotNet.NamedPipes.Objects;
 using SeroGlint.DotNet.Security;
 
 namespace SeroGlint.DotNet.ElevatedAgent
 {
-    internal class Program
+    internal static class Program
     {
-        private static ILogger? _logger;
-        private static NamedPipeClient _namedPipeClient;
-        private static string _menu;
         private static string _namedPipeName;
-        private static int _retryCount = 3;
-        private static TimeSpan _retryDelay = new TimeSpan(0, 0, 0, 5);
+        private static int _retryCount;
+        private static TimeSpan _retryDelay;
+        private static ILogger? _logger;
+        private static INamedPipeClient _namedPipeClient = new NamedPipeClient();
+        private static ExternalProcess? _applicationExecutor;
+        private static InputValidator? _inputValidator;
 
-        /// <summary>
-        /// This program is meant to allow for elevated execution without interrupting the triggering (parent) application
-        /// </summary>
-        /// <param name="args"></param>
         private static async Task Main(string[] args)
         {
             _logger = new LoggerFactoryBuilder()
@@ -29,14 +25,8 @@ namespace SeroGlint.DotNet.ElevatedAgent
                 .EnableFileOutput(createLogPath: true, logPath: "Logs", logName: "ElevatedAgent")
                 .BuildSerilog();
 
-            BuildMenu();
-
-            if (!ValidateArguments(args))
-            {
-                return;
-            }
-
-            if (!ValidateArgumentValues(args))
+            _inputValidator = new InputValidator(_logger, args);
+            if (!_inputValidator.ValidateParameters(out _namedPipeName, out _retryCount, out _retryDelay))
             {
                 return;
             }
@@ -44,7 +34,9 @@ namespace SeroGlint.DotNet.ElevatedAgent
             InitializeNamedPipeClient();
             var applicationRunConfiguration = await TryConnectNamedPipe();
             var parsedConfiguration = await ParseRunParameters(applicationRunConfiguration);
-            await ExecuteRequestProcess(parsedConfiguration);
+
+            _applicationExecutor = new ExternalProcess(_logger, _namedPipeClient);
+            await _applicationExecutor.ExecuteRequestProcess(parsedConfiguration);
         }
 
         private static async Task<string> TryConnectNamedPipe()
@@ -62,10 +54,10 @@ namespace SeroGlint.DotNet.ElevatedAgent
             for (var i = 0; i < _retryCount; i++)
             {
                 _logger?.LogInformation("Attempting to connect to the named pipe server...");
-                _logger?.LogInformation($"Named Pipe Name: {_namedPipeName}");
-                _logger?.LogInformation($"Connection Attempt: {i + 1} of {_retryCount}");
+                _logger?.LogInformation("Named Pipe Name: {name}", _namedPipeName);
+                _logger?.LogInformation("Connection Attempt: {count} of {retryCount}", i + 1, _retryCount);
 
-                configurationResponse = await _namedPipeClient.SendAsync(message);
+                configurationResponse = await _namedPipeClient.SendAsync(message)! ?? "";
 
                 if (!_namedPipeClient.IsConnected)
                 {
@@ -77,97 +69,6 @@ namespace SeroGlint.DotNet.ElevatedAgent
             }
 
             return configurationResponse;
-        }
-
-        private static void BuildMenu()
-        {
-            var menuBuilder = new MenuBuilder(_logger)
-                .WithTitle("Welcome to ElevatedAgent by Iterix!")
-                .WithBodyText(
-                    "This agent allows you to execute elevated commands without interrupting the parent application. The following arguments are required to leverage this system.")
-                .WithLineSeparatorCharacter('=')
-                .WithLineLength(50)
-                .AsUnorderedList(false)
-                .AddMenuOption("[STRING] PipeName (required)")
-                .AddMenuOption("[INT] RetryAttemptCount (default 3 tries total)")
-                .AddMenuOption("[INT] RetryAttemptDelay (default 5 seconds)");
-
-            _menu = menuBuilder.Build();
-        }
-
-        private static bool ValidateArguments(string[] args)
-        {
-            if (args.Length < 4 && args.Length > 0)
-            {
-                return true;
-            }
-
-            _logger?.LogError("Insufficient arguments provided. Please provide the required arguments to run this agent.");
-            _logger?.LogInformation("Arguments required: [RunElevated] [NamedPipeName] [ExecutablePath]");
-            _logger?.LogInformation("Example: ElevatedAgent.exe true MyNamedPipe C:\\Path\\To\\Executable.exe");
-            _logger?.LogInformation(_menu);
-            return false;
-        }
-
-        private static bool ValidateArgumentValues(string[] args)
-        {
-            _namedPipeName = args.Length > 0 ? args[0] : string.Empty;
-            if (!ValidatePipeNameArgument())
-            {
-                return false;
-            }
-
-            ValidateRetryParameters(args);
-
-            _logger?.LogInformation($"Named Pipe Name: {_namedPipeName}");
-            _logger?.LogInformation($"Retry Count: {_retryCount}");
-            _logger?.LogInformation($"Retry Delay: {_retryDelay.TotalSeconds} seconds");
-            return true;
-        }
-
-        private static void ValidateRetryParameters(string[] args)
-        {
-            if (args.Length > 1 && int.TryParse(args[1], out var retryCount) && retryCount > 0)
-            {
-                _retryCount = retryCount;
-            }
-            else
-            {
-                _logger?.LogInformation("No valid retry count provided. Using default value of 3.");
-            }
-
-            if (args.Length > 2 && TimeSpan.TryParse(args[2], out var retryDelay) && retryDelay.TotalSeconds > 0)
-            {
-                _retryDelay = retryDelay;
-            }
-            else
-            {
-                _logger?.LogInformation("No valid retry delay provided. Using default value of 5 seconds.");
-            }
-        }
-
-        private static bool ValidatePipeNameArgument()
-        {
-            if (_namedPipeName.IsNullOrWhitespace())
-            {
-                _logger?.LogError("No named pipe name provided. Please provide a valid named pipe name.");
-                _logger?.LogInformation(_menu);
-                return false;
-            }
-
-            switch (_namedPipeName.Length)
-            {
-                case < 3:
-                    _logger?.LogError("Named pipe name is too short. Please provide a valid named pipe name.");
-                    _logger?.LogInformation(_menu);
-                    return false;
-                case > 256:
-                    _logger?.LogError("Named pipe name is too long. Please provide a valid named pipe name.");
-                    _logger?.LogInformation(_menu);
-                    return false;
-            }
-
-            return true;
         }
 
         private static void InitializeNamedPipeClient()
@@ -224,27 +125,6 @@ namespace SeroGlint.DotNet.ElevatedAgent
             }
 
             return response;
-        }
-
-        private static async Task ExecuteRequestProcess(EaConfigurationResponse parsedConfiguration)
-        {
-            await _namedPipeClient.SendAsync(new EaMessage()
-                .WithOperationType("Event")
-                .WithPipeName(_namedPipeName)
-                .WithMessage("Attempting to execute application with given configuration.")
-                .BuildPipeEnvelope());
-
-            _logger?.LogInformation("Executing application with the provided configuration...");
-
-            ExecuteApplicationLaunch(parsedConfiguration);
-        }
-
-        private static void ExecuteApplicationLaunch(EaConfigurationResponse parsedConfiguration)
-        {
-            var processInfo = new ProcessStartInfo()
-            {
-                // TODO launch as admin based on config arguments
-            };
         }
     }
 }
